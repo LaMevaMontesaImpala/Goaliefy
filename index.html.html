@@ -66,7 +66,6 @@
         <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
             
-            <!-- Dropzone robusto (DIV interactivo para evitar bloqueos de seguridad del navegador) -->
             <div id="drop-zone" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full">
                 <div class="pointer-events-none flex flex-col items-center">
                     <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +95,7 @@
                     <canvas id="annotation-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10 touch-none"></canvas>
                 </div>
 
-                <!-- Precision Control Bar with Draw Tools -->
+                <!-- Precision Control Bar with Draw & Clear Tools -->
                 <div class="flex flex-wrap items-center justify-center p-3 bg-black/60 border border-apple-border rounded-xl gap-4">
                     <div class="flex items-center space-x-2">
                         <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Speed</span>
@@ -121,13 +120,14 @@
 
                     <div class="h-6 w-px bg-apple-border hidden sm:block"></div>
 
+                    <!-- TELUSTRATOR BUTTONS -->
                     <div class="flex items-center space-x-2">
                         <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Analyze</span>
-                        <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1" title="Toggle Tactical Drawing">
+                        <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1 cursor-pointer" title="Toggle Tactical Drawing">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             <span>Draw</span>
                         </button>
-                        <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition flex items-center space-x-1" title="Clear Annotations">
+                        <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition flex items-center space-x-1 cursor-pointer" title="Clear Annotations">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             <span>Clear</span>
                         </button>
@@ -184,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- Expanded Technical Characteristics & Drills -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
@@ -220,7 +219,7 @@
         const btnReset = document.getElementById('btn-reset');
         const resultsSection = document.getElementById('results-section');
 
-        // ---- CANVAS DRAWING ENGINE ----
+        // ---- CANVAS DRAWING ENGINE (TELUSTRATOR) ----
         const canvas = document.getElementById('annotation-canvas');
         const ctx = canvas.getContext('2d');
         const btnDraw = document.getElementById('btn-draw');
@@ -298,7 +297,7 @@
         document.getElementById('btn-frame-prev').addEventListener('click', () => { videoPreview.pause(); videoPreview.currentTime = Math.max(0, videoPreview.currentTime - frameStep); });
         document.getElementById('btn-frame-next').addEventListener('click', () => { videoPreview.pause(); videoPreview.currentTime = Math.min(videoPreview.duration, videoPreview.currentTime + frameStep); });
 
-        // ---- FILE HANDLING (BULLETPROOF) ----
+        // ---- FILE HANDLING ----
         function processFile(file) {
             if (file && file.type.startsWith('video/')) {
                 const fileURL = URL.createObjectURL(file);
@@ -325,7 +324,6 @@
             if (this.files && this.files.length > 0) processFile(this.files[0]);
         });
 
-        // Drag & Drop Direct Handling
         window.addEventListener('dragover', e => e.preventDefault());
         window.addEventListener('drop', e => e.preventDefault());
 
@@ -439,82 +437,4 @@
             { label: "Late Deflection", impact: "Reflex Dependent" }
         ];
 
-        const getRandomInRange = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
-        const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
-        // ---- ANALYSIS ENGINE ----
-        btnAnalyze.addEventListener('click', function() {
-            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Extracting Data...`;
-            btnAnalyze.disabled = true;
-
-            setTimeout(() => {
-                const playTypes = Object.keys(knowledgeBase);
-                const selectedPlayName = getRandomItem(playTypes);
-                const data = knowledgeBase[selectedPlayName];
-                const vision = getRandomItem(visionFactors);
-
-                const reactTime = getRandomInRange(data.metrics.reactRange[0], data.metrics.reactRange[1]);
-                const velocity = getRandomInRange(data.metrics.velRange[0], data.metrics.velRange[1]);
-                const depth = getRandomInRange(data.metrics.depthRange[0], data.metrics.depthRange[1]);
-                const clearance = getRandomItem(data.metrics.clearances);
-
-                document.getElementById('dyn-situation').textContent = selectedPlayName;
-                document.getElementById('dyn-vision').textContent = vision.label;
-                document.getElementById('dyn-confidence').textContent = getRandomInRange(94, 99) + '%';
-
-                document.getElementById('dyn-reaction').textContent = reactTime + 's';
-                document.getElementById('sub-reaction').textContent = reactTime < 0.20 ? "Elite Timing" : "Actionable Latency";
-                document.getElementById('sub-reaction').className = `text-[10px] font-medium ${reactTime < 0.20 ? 'text-emerald-400' : 'text-amber-400'}`;
-
-                document.getElementById('label-velocity').textContent = data.metrics.velLabel;
-                document.getElementById('dyn-velocity').textContent = velocity + ' ' + data.metrics.velUnit;
-
-                document.getElementById('dyn-depth').textContent = depth + ' m';
-                document.getElementById('sub-depth').textContent = "From goal line";
-                document.getElementById('sub-depth').className = "text-[10px] font-medium text-blue-400";
-
-                document.getElementById('dyn-clearance').textContent = clearance.t;
-                document.getElementById('sub-clearance').textContent = clearance.s ? "Safe Execution" : "Secondary Danger";
-                document.getElementById('sub-clearance').className = `text-[10px] font-medium ${clearance.s ? 'text-emerald-400' : 'text-red-400'}`;
-
-                const breakdownHTML = `
-                    <li><strong class="text-white">Biomechanical & Posture Mechanics:</strong> ${getRandomItem(data.breakdowns.biomechanics)}</li>
-                    <li><strong class="text-white">Upper Body & Stick Angle Execution:</strong> ${getRandomItem(data.breakdowns.hands)}</li>
-                    <li><strong class="text-white">Kinetic Recovery & Deceleration:</strong> ${getRandomItem(data.breakdowns.recovery)} Evaluated at a depth of ${depth}m under ${vision.label.toLowerCase()} conditions.</li>
-                `;
-                document.getElementById('dyn-breakdown').innerHTML = breakdownHTML;
-
-                const trainingHTML = data.drills.map(d => {
-                    const isFocus = d.startsWith("Focus:");
-                    return `<p><strong class="text-white">${isFocus ? "Weekly Focus:" : d.split(":")[0] + ":"}</strong> ${d.split(":")[1]}</p>`;
-                }).join('');
-                document.getElementById('dyn-training').innerHTML = trainingHTML;
-
-                resultsSection.classList.remove('hidden');
-                btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 1000);
-        });
-
-        btnReset.addEventListener('click', function() {
-            videoPreview.pause();
-            videoPreview.src = "";
-            videoPreview.load();
-            videoInput.value = ""; 
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            isDrawingMode = false;
-            canvas.classList.add('pointer-events-none');
-            canvas.classList.remove('cursor-crosshair');
-            btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
-            btnDraw.querySelector('span').textContent = "Draw";
-
-            resultsSection.classList.add('hidden');
-            playerContainer.classList.add('hidden');
-            dropZone.classList.remove('hidden');
-            btnAnalyze.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg><span>Extract Technical Data</span>`;
-            btnAnalyze.disabled = false;
-        });
-    </script>
-</body>
-</html>
+        const getRandomInRange = (min, max) => (Math.random() *
