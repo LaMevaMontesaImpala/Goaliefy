@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goaliefy | AI Goalkeeper Intelligence</title>
+    <title>Goaliefy | Precision Goalkeeper Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -38,6 +38,34 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
+        /* Custom styling for the goal map visual */
+        .goal-frame {
+            border: 6px solid #f5f5f7;
+            border-bottom: 2px dashed #86868b;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            aspect-ratio: 21.4 / 7; /* Approximate hockey goal ratio 3.66m x 2.14m */
+            width: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 100%);
+        }
+        .shot-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background-color: #ef4444; /* Red */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+            z-index: 10;
+        }
+        .clearance-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #ef4444 0%, #10b981 100%);
+            transform-origin: left center;
+            z-index: 5;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
@@ -52,19 +80,21 @@
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
         <div class="flex items-center space-x-4">
-            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">AI Intelligence</span>
+            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">Pro Analytics Engine</span>
         </div>
     </header>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
         
         <div class="text-center space-y-2">
-            <h1 class="text-3xl font-bold tracking-tight text-white">Advanced Goalkeeper Video Analysis</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Drop your game footage. Our AI instantly classifies the situation, calculates high-precision metrics, and delivers elite technical breakdowns.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-white">Precision Performance Breakdown</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Upload footage to access frame-by-frame analysis, spatial positioning metrics, and data-driven feedback tailored to your exact execution.</p>
         </div>
 
         <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
+            
+            <!-- Robust Drag & Drop Label -->
             <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
                 <div class="pointer-events-none flex flex-col items-center">
                     <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +106,7 @@
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-m4v,video/*" class="hidden">
             </label>
 
-            <!-- Video Player -->
+            <!-- Video Player & Precision Controls -->
             <div id="player-container" class="hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
@@ -88,29 +118,53 @@
                     </button>
                 </div>
 
-                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex items-center justify-center">
+                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center group">
                     <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                </div>
+
+                <!-- NEW: Precision Video Control Bar -->
+                <div class="flex items-center justify-center p-3 bg-black/60 border border-apple-border rounded-xl space-x-4">
+                    <div class="flex items-center space-x-2 border-r border-apple-border pr-4">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Speed</span>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Frame</span>
+                        <button id="btn-frame-prev" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
+                            <span>-1</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button id="btn-frame-next" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <span>+1</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div id="action-bar" class="flex justify-center pt-2">
                     <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        <span>Run AI Technical Analysis</span>
+                        <span>Extract Technical Data</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Dashboard Dinámico -->
+        <!-- Dynamic Results Dashboard -->
         <div id="results-section" class="hidden space-y-6">
+            
+            <!-- Context Banner (Replaces imprecise AI tags) -->
             <div class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">AI Detected Situation:</span>
-                    <span id="ai-tag-badge" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">-</span>
+                    <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Vision & Context Factor:</span>
+                    <span id="dyn-vision" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
                 </div>
-                <span class="text-xs text-apple-textSecondary">Confidence: <strong id="ai-confidence" class="text-white">99.1%</strong></span>
+                <span class="text-xs text-apple-textSecondary">Impact: <strong id="dyn-impact" class="text-white">-</strong></span>
             </div>
 
+            <!-- Upgraded Metrics Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Reaction Time</span>
@@ -118,52 +172,50 @@
                     <span id="sub-reaction" class="text-[10px] font-medium">-</span>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary" id="label-velocity">Slide / Action Velocity</span>
+                    <span class="text-xs text-apple-textSecondary">Action Velocity</span>
                     <p id="dyn-velocity" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span id="sub-velocity" class="text-[10px] font-medium">-</span>
+                    <span id="sub-velocity" class="text-[10px] text-emerald-400 font-medium">Kinetic output</span>
+                </div>
+                <!-- NEW: Depth Metric -->
+                <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                    <span class="text-xs text-apple-textSecondary">Depth Positioning</span>
+                    <p id="dyn-depth" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span id="sub-depth" class="text-[10px] font-medium">-</span>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Angular Coverage</span>
-                    <p id="dyn-coverage" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span id="sub-coverage" class="text-[10px] font-medium">-</span>
-                </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Clearance Control</span>
-                    <p id="dyn-clearance" class="text-xl font-bold text-white mt-1 leading-tight">-</p>
+                    <span class="text-xs text-apple-textSecondary">Clearance Zone</span>
+                    <p id="dyn-clearance" class="text-lg font-bold text-white mt-1 leading-tight">-</p>
                     <span id="sub-clearance" class="text-[10px] font-medium">-</span>
                 </div>
             </div>
 
+            <!-- Breakdown & Shot Map -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Deep Technical Breakdown</h3>
-                    <ul id="dyn-breakdown" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <!-- Inyectado via JS -->
-                    </ul>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-emerald-400">Personalized Training Plan</h3>
-                    <div id="dyn-training" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <!-- Inyectado via JS -->
+                
+                <!-- NEW: Shot Placement Map -->
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4 flex flex-col">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Shot Placement Map</h3>
+                    <p class="text-xs text-apple-textSecondary mb-2">Visualizing ball trajectory and resulting clearance vector.</p>
+                    
+                    <div class="flex-1 flex items-center justify-center px-4 pb-4">
+                        <div class="goal-frame" id="goal-frame">
+                            <div class="shot-dot" id="shot-dot"></div>
+                            <div class="clearance-line" id="clearance-line"></div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Deep Breakdown -->
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Technical Breakdown</h3>
+                    <ul id="dyn-breakdown" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                        <!-- Injected via JS -->
+                    </ul>
+                </div>
+
             </div>
         </div>
         
-        <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Goaliefy Algorithmic Methodology</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-apple-textSecondary">
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">⏱️ Reaction Timing</strong> Computed from the exact video frame of stick-ball impact to the initial muscular contraction vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">📐 Angular Coverage</strong> Calculates geometrical net occupancy relative to the attacker's shooting vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">🏒 Clearance Efficiency</strong> Classifies whether the ball is safely redirected to flanks or creates dangerous secondary scrambles.
-                </div>
-            </div>
-        </div>
     </main>
 
     <script>
@@ -176,73 +228,67 @@
         const btnReset = document.getElementById('btn-reset');
         const resultsSection = document.getElementById('results-section');
 
-        // BASE DE DATOS MOCKUP: Diferentes escenarios y variables dinámicas
-        const knowledgeBase = {
-            "Penalty Corner (Rush Defense)": {
-                metrics: {
-                    reactRange: [0.15, 0.23],
-                    velRange: [1.3, 1.8], velLabel: "Rush Velocity", velUnit: "m/s",
-                    covRange: [90, 98],
-                    clearances: ["Clean Sideline", "Trapped Under Pads", "Dangerous Top D Rebound", "High Deflection"]
-                },
-                breakdowns: {
-                    position: ["Explosive start off the line with optimal pad width.", "Slight weight imbalance on the back foot delayed the initial thrust.", "Excellent low-base center of gravity maintained prior to injection."],
-                    hands: ["Left hand kept high, effectively neutralizing the roof zone.", "Stick dropped too early, opening the high glove side.", "Perfect 45-degree stick angle maintained through the slide to deflect energy."],
-                    recovery: ["Slide momentum carried too far out of the primary shooting angle.", "Quick core rotation allowed for immediate secondary save readiness.", "Took too long to regain vertical stance after the clearance."]
-                },
-                drills: [
-                    "Drill 1: 5m explosive rush-outs with a tennis ball reaction toss.",
-                    "Drill 2: Shadowing the drag-flicker's hip rotation to anticipate high/low placement.",
-                    "Focus: Maintain ankle dorsiflexion to shave off 0.02s in initial push-off."
-                ]
-            },
-            "Baseline Drive & Cut-Back": {
-                metrics: {
-                    reactRange: [0.18, 0.28],
-                    velRange: [0.8, 1.2], velLabel: "Post-to-Post Speed", velUnit: "s",
-                    covRange: [85, 95],
-                    clearances: ["Intercepted Pass", "Deflected Out of Bounds", "Poked Away", "Missed Interception"]
-                },
-                breakdowns: {
-                    position: ["Perfect near-post seal leaving zero zero-angle gaps.", "Pulled too far off the post, exposing the short side.", "Excellent tracking of the ball carrier's stick head along the baseline."],
-                    hands: ["Stick positioned flat on the turf to intercept the cut-back pass.", "Gloves held too high for a ground-level threat.", "Active left hand ready to swat aerial baseline crosses."],
-                    recovery: ["Seamless transition from post-hug to central spread.", "Overcommitted on the slide, leaving the stroke spot completely open.", "Strong push off the post leg to challenge the inward drive."]
-                },
-                drills: [
-                    "Drill 1: Post-to-post rapid lateral shuffles with ground stick sweeps.",
-                    "Drill 2: Defending 2v1 situations starting from the baseline.",
-                    "Focus: Keep the stick glued to the turf when defending cut-back passing lanes."
-                ]
-            },
-            "Post Close-Out / 1v1 Isolation": {
-                metrics: {
-                    reactRange: [0.14, 0.22],
-                    velRange: [2.0, 3.5], velLabel: "Close-Out Distance", velUnit: "m",
-                    covRange: [92, 100],
-                    clearances: ["Clean Tackle", "Forced Wide", "Smothered", "Fouled / Stroke Risk"]
-                },
-                breakdowns: {
-                    position: ["Perfect timing on the rush, smothering the striker at the top of the D.", "Stayed too deep on the line, giving the attacker time to pick a spot.", "Excellent spread technique, creating a massive physical barrier."],
-                    hands: ["Gloves and stick synchronized to cover the 5-hole completely.", "Stick side was exposed during the final step of the close-out.", "Aggressive stick tackle executed cleanly without body contact."],
-                    recovery: ["Instant spring back to feet after the initial block.", "Lost tracking of the ball after the collision.", "Excellent secondary scramble to clear the loose ball."]
-                },
-                drills: [
-                    "Drill 1: 1v1 decision-making: when to hold vs when to engage aggressively.",
-                    "Drill 2: Slide tackles and immediate pop-ups on the rebound board.",
-                    "Focus: Explode forward but break your momentum just before the attacker shoots."
-                ]
-            }
-        };
+        // ---- PRECISION VIDEO CONTROLS ----
+        const speedBtns = document.querySelectorAll('.speed-btn');
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const speed = parseFloat(e.target.dataset.speed);
+                videoPreview.playbackRate = speed;
+                
+                // Update UI
+                speedBtns.forEach(b => {
+                    b.classList.remove('bg-apple-accent');
+                    b.classList.add('bg-apple-card');
+                });
+                e.target.classList.remove('bg-apple-card');
+                e.target.classList.add('bg-apple-accent');
+            });
+        });
 
-        // Utilidades
+        // Frame by frame assumes ~30fps (0.033s per frame)
+        const frameStep = 0.033; 
+        document.getElementById('btn-frame-prev').addEventListener('click', () => {
+            videoPreview.pause();
+            videoPreview.currentTime = Math.max(0, videoPreview.currentTime - frameStep);
+        });
+        document.getElementById('btn-frame-next').addEventListener('click', () => {
+            videoPreview.pause();
+            videoPreview.currentTime = Math.min(videoPreview.duration, videoPreview.currentTime + frameStep);
+        });
+
+        // ---- KNOWLEDGE BASE (DYNAMIC GENERATOR) ----
+        const contextFactors = [
+            { label: "Clean Line of Sight", impact: "Baseline Standard" },
+            { label: "Screened by Defense", impact: "High Cognitive Load" },
+            { label: "Late Deflection", impact: "Extreme Reflex Required" }
+        ];
+
+        const clearances = [
+            { text: "Clean Sideline", safe: true },
+            { text: "Trapped / Smothered", safe: true },
+            { text: "Top of D Rebound", safe: false },
+            { text: "High Aerial Danger", safe: false }
+        ];
+
+        const positioningFeedback = [
+            "Excellent low-base center of gravity maintained at the point of injection.",
+            "Weight slightly back on the heels, delaying the explosive forward thrust.",
+            "Perfect bisector alignment relative to the ball carrier's stick.",
+            "Hips opened too early, exposing the five-hole trajectory."
+        ];
+
+        const handsFeedback = [
+            "Left glove positioned high and active, sealing the roof zone.",
+            "Stick angle flattened perfectly to redirect kinetic energy safely wide.",
+            "Dropped hands prematurely before reading the ball flight.",
+            "Strong forearm block, locking the rebound dead against the body."
+        ];
+
+        // Utils
         const getRandomInRange = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
         const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        const getStatusColor = (val, optimal, isPercent = false) => {
-            if (isPercent) return val >= optimal ? "text-emerald-400" : "text-amber-400";
-            return val <= optimal ? "text-emerald-400" : "text-amber-400";
-        };
-
-        // Eventos Drag & Drop nativos
+        
+        // ---- DRAG AND DROP LOGIC ----
         window.addEventListener('dragover', e => e.preventDefault());
         window.addEventListener('drop', e => e.preventDefault());
 
@@ -254,7 +300,6 @@
             e.preventDefault();
             dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
         });
-
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
@@ -263,7 +308,6 @@
                 videoInput.dispatchEvent(new Event('change'));
             }
         });
-
         dropZone.addEventListener('click', () => videoInput.click());
 
         videoInput.addEventListener('change', function(e) {
@@ -283,65 +327,76 @@
             }
         });
 
-        // Motor de Análisis Dinámico
+        // ---- ANALYSIS ENGINE ----
         btnAnalyze.addEventListener('click', function() {
-            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing play dynamics...`;
+            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Extracting Data...`;
             btnAnalyze.disabled = true;
 
             setTimeout(() => {
-                // 1. Elegir tipo de jugada aleatoria
-                const playTypes = Object.keys(knowledgeBase);
-                const selectedPlay = getRandomItem(playTypes);
-                const data = knowledgeBase[selectedPlay];
+                // Generate Dynamic Metrics
+                const context = getRandomItem(contextFactors);
+                const reactTime = getRandomInRange(0.14, 0.29);
+                const velocity = getRandomInRange(1.0, 2.5);
+                const depth = getRandomInRange(0.5, 3.5); // Meters from goal line
+                const clearance = getRandomItem(clearances);
 
-                // 2. Poblar Cabecera
-                document.getElementById('ai-tag-badge').textContent = selectedPlay;
-                document.getElementById('ai-confidence').textContent = getRandomInRange(92, 99) + '%';
+                // Populate Context
+                document.getElementById('dyn-vision').textContent = context.label;
+                document.getElementById('dyn-impact').textContent = context.impact;
 
-                // 3. Generar Métricas Matemáticas
-                const reactTime = getRandomInRange(data.metrics.reactRange[0], data.metrics.reactRange[1]);
-                const velocity = getRandomInRange(data.metrics.velRange[0], data.metrics.velRange[1]);
-                const coverage = getRandomInRange(data.metrics.covRange[0], data.metrics.covRange[1]);
-                const clearance = getRandomItem(data.metrics.clearances);
-
-                // Pintar métricas y colores según rendimiento
+                // Populate Grids
                 document.getElementById('dyn-reaction').textContent = reactTime + 's';
-                document.getElementById('sub-reaction').textContent = reactTime < 0.20 ? "Elite Threshold Met" : "Room for Improvement";
-                document.getElementById('sub-reaction').className = `text-[10px] font-medium ${getStatusColor(reactTime, 0.20)}`;
+                document.getElementById('sub-reaction').textContent = reactTime < 0.20 ? "Elite Timing" : "Actionable Latency";
+                document.getElementById('sub-reaction').className = `text-[10px] font-medium ${reactTime < 0.20 ? 'text-emerald-400' : 'text-amber-400'}`;
 
-                document.getElementById('label-velocity').textContent = data.metrics.velLabel;
-                document.getElementById('dyn-velocity').textContent = velocity + ' ' + data.metrics.velUnit;
-                document.getElementById('sub-velocity').textContent = "Calculated vector";
-                document.getElementById('sub-velocity').className = "text-[10px] font-medium text-emerald-400";
+                document.getElementById('dyn-velocity').textContent = velocity + ' m/s';
 
-                document.getElementById('dyn-coverage').textContent = coverage + '%';
-                document.getElementById('sub-coverage').textContent = coverage > 90 ? "Optimal Posture" : "Exposed Angles Detected";
-                document.getElementById('sub-coverage').className = `text-[10px] font-medium ${getStatusColor(coverage, 90, true)}`;
+                document.getElementById('dyn-depth').textContent = depth + ' m';
+                document.getElementById('sub-depth').textContent = depth > 2.0 ? "Aggressive Cut-Down" : "Deep Posture";
+                document.getElementById('sub-depth').className = `text-[10px] font-medium ${depth > 2.0 ? 'text-blue-400' : 'text-emerald-400'}`;
 
-                document.getElementById('dyn-clearance').textContent = clearance;
-                document.getElementById('sub-clearance').textContent = clearance.includes("Dangerous") ? "Critical Error" : "Safe Execution";
-                document.getElementById('sub-clearance').className = `text-[10px] font-medium ${clearance.includes("Dangerous") ? "text-red-400" : "text-blue-400"}`;
+                document.getElementById('dyn-clearance').textContent = clearance.text;
+                document.getElementById('sub-clearance').textContent = clearance.safe ? "Safe Execution" : "Secondary Danger";
+                document.getElementById('sub-clearance').className = `text-[10px] font-medium ${clearance.safe ? 'text-emerald-400' : 'text-red-400'}`;
 
-                // 4. Construir Breakdown Técnico Dinámico
+                // Populate Breakdown
                 const breakdownHTML = `
-                    <li><strong class="text-white">Set Position:</strong> ${getRandomItem(data.breakdowns.position)}</li>
-                    <li><strong class="text-white">Stick & Hands:</strong> ${getRandomItem(data.breakdowns.hands)}</li>
-                    <li><strong class="text-white">Recovery Phase:</strong> ${getRandomItem(data.breakdowns.recovery)}</li>
+                    <li><strong class="text-white">Positioning:</strong> ${getRandomItem(positioningFeedback)} Depth measured at ${depth}m from the line.</li>
+                    <li><strong class="text-white">Contact & Hands:</strong> ${getRandomItem(handsFeedback)}</li>
                 `;
                 document.getElementById('dyn-breakdown').innerHTML = breakdownHTML;
 
-                // 5. Construir Entrenamiento
-                const trainingHTML = data.drills.map(d => {
-                    const isFocus = d.startsWith("Focus:");
-                    return `<p><strong class="text-white">${isFocus ? "Weekly Focus:" : d.split(":")[0] + ":"}</strong> ${d.split(":")[1]}</p>`;
-                }).join('');
-                document.getElementById('dyn-training').innerHTML = trainingHTML;
+                // ---- GOAL MAP VISUALIZATION ----
+                // Randomize target coordinates (0% to 100% of the goal width/height)
+                const shotX = Math.floor(Math.random() * 90) + 5; // Keep away from absolute edges
+                const shotY = Math.floor(Math.random() * 90) + 5;
+                
+                const dot = document.getElementById('shot-dot');
+                dot.style.left = `${shotX}%`;
+                dot.style.top = `${shotY}%`;
 
-                // Mostrar resultados
+                // Draw clearance vector line based on safety
+                const line = document.getElementById('clearance-line');
+                line.style.left = `${shotX}%`;
+                line.style.top = `${shotY}%`;
+                line.style.width = '60px'; // Length of vector arrow
+                
+                // If safe, point outwards (0 or 180 deg). If dangerous, point inwards.
+                let angle;
+                if (clearance.safe) {
+                    angle = shotX > 50 ? -30 : -150; // Deflect towards nearest sideline
+                    line.style.background = 'linear-gradient(90deg, #ef4444 0%, #10b981 100%)'; // Red to Green
+                } else {
+                    angle = 90; // Deflect straight back out (dangerous rebound)
+                    line.style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 100%)'; // Red to Orange/Warning
+                }
+                line.style.transform = `translate(-5%, -50%) rotate(${angle}deg)`;
+
+                // Show Results
                 resultsSection.classList.remove('hidden');
                 btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 1200);
+            }, 1000);
         });
 
         // Reset
@@ -353,7 +408,7 @@
             resultsSection.classList.add('hidden');
             playerContainer.classList.add('hidden');
             dropZone.classList.remove('hidden');
-            btnAnalyze.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg><span>Run AI Technical Analysis</span>`;
+            btnAnalyze.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg><span>Extract Technical Data</span>`;
             btnAnalyze.disabled = false;
         });
     </script>
