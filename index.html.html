@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gooalify — Elite Goalkeeper Video Intelligence</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        apple: {
+                            bg: '#000000',
+                            card: '#111115',
+                            cardHover: '#1a1a20',
+                            border: '#27272a',
+                            accent: '#3b82f6',
+                            accentGlow: 'rgba(59, 130, 246, 0.15)',
+                            textMain: '#f4f4f5',
+                            textMuted: '#a1a1aa',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #f4f4f5;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(17, 17, 21, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(24, 24, 29, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .glow-effect {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-apple-border px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToUpload()">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-shield-halved text-white text-base"></i>
+            </div>
+            <div>
+                <span class="text-lg font-bold tracking-tight text-white">Gooalify</span>
+                <span class="text-xs px-2 py-0.5 ml-2 rounded-full bg-blue-500/10 text-blue-400 font-medium border border-blue-500/20">PRO GOALIE AI</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <button onclick="switchView('upload')" id="navUploadBtn" class="text-sm font-medium text-apple-textMuted hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5">
+                <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Upload Clip
+            </button>
+            <button onclick="switchView('dashboard')" id="navDashboardBtn" class="text-sm font-medium text-apple-textMuted hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5 hidden">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+            </button>
+            <div class="h-4 w-px bg-apple-border"></div>
+            <div class="flex items-center space-x-2 bg-apple-card px-3 py-1.5 rounded-full border border-apple-border">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-xs font-medium text-apple-textMain">Daniel Hernández (45)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 flex flex-col">
+
+        <!-- VIEW 1: UPLOAD & DROP ZONE -->
+        <div id="uploadView" class="flex-1 flex flex-col items-center justify-center py-12">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
+                    Elite Goalkeeper Video Intelligence.
+                </h1>
+                <p class="text-apple-textMuted text-base md:text-lg">
+                    Upload your match or training clips to instantly decode reaction times, slide execution speed, geometry angles, and professional performance metrics.
+                </p>
+            </div>
+
+            <!-- Drop Zone Box -->
+            <div id="dropZone" 
+                 class="w-full max-w-2xl h-80 rounded-3xl border-2 border-dashed border-apple-border hover:border-blue-500/50 bg-apple-card/40 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center cursor-pointer transition-all duration-300 group relative overflow-hidden shadow-2xl"
+                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                
+                <div class="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
+
+                <div class="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-inner">
+                    <i class="fa-solid fa-arrow-up-from-bracket text-3xl text-blue-400"></i>
+                </div>
+
+                <h3 class="text-xl font-semibold text-white mb-2">Drag & Drop your match video here</h3>
+                <p class="text-apple-textMuted text-sm mb-6">Supports .mp4, .mov, .webm, .m4v files</p>
+
+                <div class="flex items-center space-x-3">
+                    <label class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition shadow-lg shadow-blue-600/30 cursor-pointer">
+                        Browse Files
+                        <input type="file" id="fileInput" accept="video/*" class="hidden" onchange="handleFileSelect(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: ANALYSIS DASHBOARD -->
+        <div id="dashboardView" class="flex-1 flex flex-col space-y-6 hidden">
+            
+            <!-- Top Bar with Back & Clip Info -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-4 rounded-2xl">
+                <div class="flex items-center space-x-4">
+                    <button onclick="resetToUpload()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-apple-textMuted hover:text-white transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 id="currentClipTitle" class="text-lg font-bold text-white">Penalty-Egara.mp4</h2>
+                            <span id="clipCategoryBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">Penalty Corner Defense</span>
+                        </div>
+                        <p class="text-xs text-apple-textMuted mt-0.5">Analyzed via Gooalify Goalkeeper Computer Vision v2.4</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="triggerNewAnalysis()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition border border-apple-border">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Analyze Another Clip
+                    </button>
+                    <button onclick="exportReport()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition shadow-lg shadow-blue-600/30">
+                        <i class="fa-solid fa-download mr-2"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Left Column: Video Preview & Key KPIs (2 cols on large) -->
+                <div class="lg:col-span-2 flex flex-col space-y-6">
+                    
+                    <!-- Video Simulated Player Box -->
+                    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl relative group flex flex-col">
+                        <div class="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+                            <!-- Real HTML5 Video Player -->
+                            <video id="userVideoElement" class="w-full h-full object-contain bg-black" controls></video>
+                            
+                            <!-- Overlay AI Tracking Elements -->
+                            <div class="absolute inset-0 z-20 pointer-events-none p-6 flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <div class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center space-x-2">
+                                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                                        <span id="aiTrackingStatus" class="text-xs font-mono text-white">ANALYZING GOALIE PERFORMANCE</span>
+                                    </div>
+                                    <div class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono text-apple-textMuted">
+                                        VISION: <span class="text-white">ACTIVE</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Info Bar under player -->
+                        <div class="p-4 bg-apple-card/80 border-t border-apple-border flex items-center justify-between text-xs">
+                            <span class="text-apple-textMuted font-medium">Uploaded File Active in Player</span>
+                            <span id="videoDurationBadge" class="text-blue-400 font-mono font-medium">Ready</span>
+                        </div>
+                    </div>
+
+                    <!-- Key Performance Indicators (KPIs) Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Save Efficiency</span>
+                            <div class="my-2">
+                                <span id="kpiEfficiency" class="text-3xl font-bold text-white tracking-tight">88%</span>
+                                <span class="text-xs text-emerald-400 font-medium block mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+4% vs league avg</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Slide Speed</span>
+                            <div class="my-2">
+                                <span id="kpiSlideSpeed" class="text-3xl font-bold text-white tracking-tight">0.24s</span>
+                                <span class="text-xs text-blue-400 font-medium block mt-1"><i class="fa-solid fa-bolt mr-1"></i>Explosive impulse</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Reaction Time</span>
+                            <div class="my-2">
+                                <span id="kpiReaction" class="text-3xl font-bold text-white tracking-tight">185ms</span>
+                                <span class="text-xs text-emerald-400 font-medium block mt-1"><i class="fa-solid fa-check mr-1"></i>Elite Tier</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Scramble Control</span>
+                            <div class="my-2">
+                                <span id="kpiScramble" class="text-3xl font-bold text-white tracking-tight">76%</span>
+                                <span class="text-xs text-amber-400 font-medium block mt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Rebound watch</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Technical Breakdown Cards & Pro Benchmark -->
+                <div class="flex flex-col space-y-6">
+                    
+                    <!-- Pro Benchmark Card -->
+                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-apple-textMuted">Pro Benchmark Match</h3>
+                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold">92% MATCH</span>
+                        </div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-lg text-white shadow-lg">
+                                TS
+                            </div>
+                            <div>
+                                <h4 class="text-base font-bold text-white">Tony Santiago Profile</h4>
+                                <p class="text-xs text-apple-textMuted">High correlation in explosive 1v1 slide & proactive stick sweep.</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-apple-border h-2 rounded-full overflow-hidden mb-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full w-[92%] rounded-full"></div>
+                        </div>
+                        <p class="text-xs text-apple-textMuted italic">"Exceptional anticipation timing and stick clearance under pressure."</p>
+                    </div>
+
+                    <!-- Technical Breakdown Cards -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col space-y-5">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-apple-textMuted">Technical Breakdown</h3>
+
+                        <!-- Card 1 -->
+                        <div class="space-y-2 pb-4 border-b border-apple-border">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-white flex items-center">
+                                    <i class="fa-solid fa-hockey-stick text-blue-400 mr-2"></i> Slide & Stick Sweep
+                                </span>
+                                <span id="techSlideScore" class="text-xs font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10">9.2 / 10</span>
+                            </div>
+                            <p id="techSlideDesc" class="text-xs text-apple-textMuted leading-relaxed">
+                                Proactive sweep timing is optimal. Stick is extended at full reach to deflect the ball away from the danger zone before forward contact.
+                            </p>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="space-y-2 pb-4 border-b border-apple-border">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-white flex items-center">
+                                    <i class="fa-solid fa-ruler-combined text-blue-400 mr-2"></i> Post & Angle Geometry
+                                </span>
+                                <span id="techGeometryScore" class="text-xs font-bold text-blue-400 px-2 py-0.5 rounded bg-blue-500/10">8.8 / 10</span>
+                            </div>
+                            <p id="techGeometryDesc" class="text-xs text-apple-textMuted leading-relaxed">
+                                Exceptional positioning along the bisectrix. Shoulders perfectly squared to the initial shot vector, closing near-post angles cleanly.
+                            </p>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-white flex items-center">
+                                    <i class="fa-solid fa-arrows-split-up-and-left text-blue-400 mr-2"></i> Rebound & Scramble
+                                </span>
+                                <span id="techReboundScore" class="text-xs font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-500/10">7.5 / 10</span>
+                            </div>
+                            <p id="techReboundDesc" class="text-xs text-apple-textMuted leading-relaxed">
+                                Recovery speed after the slide can be tightened by 0.1s to avoid second-chance scrambles in heavy goalmouth traffic.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-apple-border py-6 px-6 text-center text-xs text-apple-textMuted">
+        <p>&copy; 2026 Gooalify Intelligence. Built for elite field hockey goalkeepers. Inspired by Apple design precision.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        function switchView(viewName) {
+            const uploadView = document.getElementById('uploadView');
+            const dashboardView = document.getElementById('dashboardView');
+            const navUploadBtn = document.getElementById('navUploadBtn');
+            const navDashboardBtn = document.getElementById('navDashboardBtn');
+
+            const videoEl = document.getElementById('userVideoElement');
+
+            if (viewName === 'upload') {
+                uploadView.classList.remove('hidden');
+                dashboardView.classList.add('hidden');
+                navUploadBtn.classList.add('text-white', 'bg-white/5');
+                navUploadBtn.classList.remove('text-apple-textMuted');
+                navDashboardBtn.classList.add('hidden');
+                if (videoEl) {
+                    videoEl.pause();
+                    videoEl.src = "";
+                }
+            } else {
+                uploadView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                navDashboardBtn.classList.remove('hidden');
+                navDashboardBtn.classList.add('text-white', 'bg-white/5');
+                navUploadBtn.classList.remove('text-white', 'bg-white/5');
+                navUploadBtn.classList.add('text-apple-textMuted');
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.add('border-blue-500', 'bg-blue-500/10');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
+            
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                processVideoFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processVideoFile(file);
+            }
+        }
+
+        function processVideoFile(file) {
+            if (!file.type.startsWith('video/')) {
+                showNotification('Please upload a valid video file (.mp4, .mov, etc.)', 'amber');
+                return;
+            }
+
+            document.getElementById('currentClipTitle').innerText = file.name;
+            document.getElementById('clipCategoryBadge').innerText = "Custom Upload Video";
+
+            const videoUrl = URL.createObjectURL(file);
+            const videoEl = document.getElementById('userVideoElement');
+            videoEl.src = videoUrl;
+            videoEl.load();
+
+            // Generate randomized dynamic metrics for the uploaded video to simulate AI analysis
+            const randomEff = Math.floor(Math.random() * 8) + 88; // 88 - 95%
+            const randomSpeed = (Math.random() * 0.08 + 0.18).toFixed(2) + 's';
+            const randomReact = Math.floor(Math.random() * 25) + 165 + 'ms';
+            const randomScramble = Math.floor(Math.random() * 12) + 78 + '%';
+
+            document.getElementById('kpiEfficiency').innerText = randomEff + '%';
+            document.getElementById('kpiSlideSpeed').innerText = randomSpeed;
+            document.getElementById('kpiReaction').innerText = randomReact;
+            document.getElementById('kpiScramble').innerText = randomScramble;
+
+            document.getElementById('techSlideScore').innerText = (randomEff / 10).toFixed(1) + ' / 10';
+            document.getElementById('techGeometryScore').innerText = ((randomEff - 2) / 10).toFixed(1) + ' / 10';
+            document.getElementById('techReboundScore').innerText = ((randomEff - 6) / 10).toFixed(1) + ' / 10';
+
+            switchView('dashboard');
+            videoEl.play().catch(e => console.log("Autoplay prevented:", e));
+        }
+
+        function triggerNewAnalysis() {
+            switchView('upload');
+        }
+
+        function exportReport() {
+            showNotification('Gooalify PDF Analysis Report successfully generated!', 'blue');
+        }
+
+        function showNotification(message, color) {
+            const notif = document.createElement('div');
+            notif.className = `fixed bottom-8 right-8 z-50 glass-card bg-${color}-600/90 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-${color}-400/30 animate-bounce`;
+            notif.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>${message}</span>`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3500);
+        }
+
+        window.onload = function() {
+            switchView('upload');
+        };
+    </script>
+</body>
+</html>
