@@ -94,4 +94,425 @@
                 </div>
 
                 <!-- Video + Tactical Canvas Wrapper -->
-                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex
+                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center" id="video-wrapper">
+                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                    <canvas id="annotation-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10 touch-none"></canvas>
+                </div>
+
+                <!-- Precision Control Bar with Draw Tools -->
+                <div class="flex flex-wrap items-center justify-center p-3 bg-black/60 border border-apple-border rounded-xl gap-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Speed</span>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                    </div>
+                    
+                    <div class="h-6 w-px bg-apple-border hidden sm:block"></div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Frame</span>
+                        <button id="btn-frame-prev" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
+                            <span>-1</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <button id="btn-frame-next" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            <span>+1</span>
+                        </button>
+                    </div>
+
+                    <div class="h-6 w-px bg-apple-border hidden sm:block"></div>
+
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Analyze</span>
+                        <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1" title="Toggle Tactical Drawing">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                            <span>Draw</span>
+                        </button>
+                        <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition flex items-center space-x-1" title="Clear Annotations">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="action-bar" class="flex justify-center pt-2">
+                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <span>Extract Technical Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Results Dashboard -->
+        <div id="results-section" class="hidden space-y-6">
+            
+            <div class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Situation:</span>
+                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">-</span>
+                    </div>
+                    <div class="h-4 w-px bg-apple-border"></div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Vision:</span>
+                        <span id="dyn-vision" class="text-white text-xs font-medium">-</span>
+                    </div>
+                </div>
+                <span class="text-xs text-apple-textSecondary">Confidence: <strong id="dyn-confidence" class="text-white">-</strong></span>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                    <span class="text-xs text-apple-textSecondary">Reaction Time</span>
+                    <p id="dyn-reaction" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span id="sub-reaction" class="text-[10px] font-medium">-</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                    <span class="text-xs text-apple-textSecondary" id="label-velocity">Action Velocity</span>
+                    <p id="dyn-velocity" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span id="sub-velocity" class="text-[10px] text-emerald-400 font-medium">Kinetic output</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                    <span class="text-xs text-apple-textSecondary">Depth Positioning</span>
+                    <p id="dyn-depth" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span id="sub-depth" class="text-[10px] font-medium">-</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                    <span class="text-xs text-apple-textSecondary">Clearance Zone</span>
+                    <p id="dyn-clearance" class="text-lg font-bold text-white mt-1 leading-tight">-</p>
+                    <span id="sub-clearance" class="text-[10px] font-medium">-</span>
+                </div>
+            </div>
+
+            <!-- Expanded Technical Characteristics & Drills -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-apple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Extended Technical Execution Breakdown</span>
+                    </h3>
+                    <ul id="dyn-breakdown" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>Personalized Training Plan</span>
+                    </h3>
+                    <div id="dyn-training" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const videoInput = document.getElementById('video-upload');
+        const playerContainer = document.getElementById('player-container');
+        const videoPreview = document.getElementById('video-preview');
+        const fileNameSpan = document.getElementById('file-name');
+        const btnAnalyze = document.getElementById('btn-analyze');
+        const btnReset = document.getElementById('btn-reset');
+        const resultsSection = document.getElementById('results-section');
+
+        // ---- CANVAS DRAWING ENGINE (TELESTRATOR) ----
+        const canvas = document.getElementById('annotation-canvas');
+        const ctx = canvas.getContext('2d');
+        const btnDraw = document.getElementById('btn-draw');
+        const btnClear = document.getElementById('btn-clear');
+        
+        let isDrawingMode = false;
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+        window.addEventListener('resize', () => { if (isDrawingMode) resizeCanvas(); });
+
+        btnDraw.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            if (isDrawingMode) {
+                videoPreview.pause();
+                resizeCanvas();
+                canvas.classList.remove('pointer-events-none');
+                canvas.classList.add('cursor-crosshair');
+                btnDraw.classList.replace('bg-apple-card', 'bg-apple-accent');
+                btnDraw.querySelector('span').textContent = "Drawing...";
+            } else {
+                canvas.classList.add('pointer-events-none');
+                canvas.classList.remove('cursor-crosshair');
+                btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
+                btnDraw.querySelector('span').textContent = "Draw";
+            }
+        });
+
+        btnClear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+
+        function startDrawing(e) { if (!isDrawingMode) return; isDrawing = true; draw(e); }
+        function stopDrawing() { isDrawing = false; ctx.beginPath(); }
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#ff3b30';
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); }, {passive: false});
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }, {passive: false});
+
+        // ---- VIDEO CONTROLS ----
+        const speedBtns = document.querySelectorAll('.speed-btn');
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const speed = parseFloat(e.target.dataset.speed);
+                videoPreview.playbackRate = speed;
+                speedBtns.forEach(b => { b.classList.remove('bg-apple-accent'); b.classList.add('bg-apple-card'); });
+                e.target.classList.remove('bg-apple-card');
+                e.target.classList.add('bg-apple-accent');
+            });
+        });
+
+        const frameStep = 0.033;
+        document.getElementById('btn-frame-prev').addEventListener('click', () => { videoPreview.pause(); videoPreview.currentTime = Math.max(0, videoPreview.currentTime - frameStep); });
+        document.getElementById('btn-frame-next').addEventListener('click', () => { videoPreview.pause(); videoPreview.currentTime = Math.min(videoPreview.duration, videoPreview.currentTime + frameStep); });
+
+        // ---- FILE HANDLING (BULLETPROOF NATIVE METHOD) ----
+        videoInput.addEventListener('change', function(e) {
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                
+                // Fix para iOS/Mac: Si el tipo está vacío pero la extensión es válida, lo aceptamos.
+                const isVideo = file.type.startsWith('video/') || file.name.toLowerCase().match(/\.(mp4|mov|m4v|webm)$/);
+                
+                if (isVideo) {
+                    const fileURL = URL.createObjectURL(file);
+                    videoPreview.src = fileURL;
+                    videoPreview.load(); 
+                    fileNameSpan.textContent = file.name;
+                    
+                    // Reset UI
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    isDrawingMode = false;
+                    canvas.classList.add('pointer-events-none');
+                    canvas.classList.remove('cursor-crosshair');
+                    btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
+                    btnDraw.querySelector('span').textContent = "Draw";
+
+                    dropZone.classList.add('hidden');
+                    playerContainer.classList.remove('hidden');
+                } else {
+                    alert("Please upload a valid video file (MP4, MOV).");
+                }
+            }
+        });
+
+        // Hover effect for the native input drop
+        videoInput.addEventListener('dragenter', () => { dropZone.classList.add('border-apple-accent', 'bg-apple-card'); });
+        videoInput.addEventListener('dragleave', () => { dropZone.classList.remove('border-apple-accent', 'bg-apple-card'); });
+        videoInput.addEventListener('drop', () => { dropZone.classList.remove('border-apple-accent', 'bg-apple-card'); });
+
+
+        // ---- EXPANDED KNOWLEDGE BASE ----
+        const knowledgeBase = {
+            "Penalty Corner (Rush)": {
+                metrics: {
+                    reactRange: [0.15, 0.24],
+                    velRange: [1.3, 1.8], velLabel: "Rush Velocity", velUnit: "m/s",
+                    depthRange: [3.5, 4.5], 
+                    clearances: [{t: "Clean Sideline", s: true}, {t: "Trapped Under Pads", s: true}, {t: "Top D Rebound", s: false}]
+                },
+                breakdowns: {
+                    biomechanics: [
+                        "Knee flexion angle at initial push-off measured at 112° (Optimal range: 105°-115° for max explosive power).",
+                        "Trunk lean forward at 25 degrees, aligning center of mass directly over the base of support before breaking stride.",
+                        "Initial lateral foot placement shows slight heel-striking, causing a 0.03s latency in forward acceleration vector."
+                    ],
+                    hands: [
+                        "Left arm blocker angle maintained rigid at 45 degrees, successfully absorbing direct impact energy without elbow hyperextension.",
+                        "Right glove positioning dropped 4cm below optimal chest level during the slide phase, exposing the upper-mid gate briefly.",
+                        "Shaft angle of the composite stick maintained a precise 52-degree deflection plane toward the outer right sideline."
+                    ],
+                    recovery: [
+                        "Core rotational torque during exit phase was executed cleanly, allowing immediate visual acquisition of the secondary rebound zone.",
+                        "Momentum dissipation post-slide required 2 full stride cycles to regain complete verticality and balance.",
+                        "Weight distribution during recovery favored the right quad by 65%, creating an asymmetrical recovery stride."
+                    ]
+                },
+                drills: [
+                    "Drill 1: 5m explosive box-starts with weighted sled pulls to build quad-dominant acceleration.",
+                    "Drill 2: Shadowing drag-flick hip orientation with resistance bands on the gloves.",
+                    "Focus: Lock right elbow into the ribs during the slide descent to eliminate upper-gate exposure."
+                ]
+            },
+            "Baseline Drive & Cut-Back": {
+                metrics: {
+                    reactRange: [0.18, 0.28],
+                    velRange: [0.8, 1.2], velLabel: "Lateral Speed", velUnit: "m/s",
+                    depthRange: [0.0, 1.0],
+                    clearances: [{t: "Intercepted Pass", s: true}, {t: "Deflected Out", s: true}, {t: "Missed Interception", s: false}]
+                },
+                breakdowns: {
+                    biomechanics: [
+                        "Pelvic rotation speed measured at 180°/s during the post-to-post transition shuffle.",
+                        "Ankle dorsiflexion angle restricted on the sliding leg, limiting lateral slide extension by approximately 15cm.",
+                        "Center of gravity remained low throughout the baseline tracking phase, avoiding unnecessary vertical oscillation."
+                    ],
+                    hands: [
+                        "Flat edge of the stick remained in full contact with the turf for 82% of the lateral sliding movement.",
+                        "Glove separation distance widened to 40cm, creating a temporary structural weakness in the center body seal.",
+                        "Active left hand positioning successfully anticipated the aerial cross vector."
+                    ],
+                    recovery: [
+                        "Transition from full-split slide back to upright stance exhibited clean hip flexor engagement.",
+                        "Delayed recovery of the trail leg left a momentary vulnerability on the short side post.",
+                        "Head level remained remarkably stable during lateral translation, optimizing visual tracking of the ball."
+                    ]
+                },
+                drills: [
+                    "Drill 1: Lateral hurdle hops combined with immediate low-sliding stick sweeps.",
+                    "Drill 2: 2v1 baseline recovery scenarios with restricted vision cones.",
+                    "Focus: Maintain active stick contact on the turf during the entire lateral transition."
+                ]
+            },
+            "1v1 Open Play": {
+                metrics: {
+                    reactRange: [0.14, 0.22],
+                    velRange: [2.0, 3.5], velLabel: "Close-Out Speed", velUnit: "m/s",
+                    depthRange: [2.0, 3.5],
+                    clearances: [{t: "Clean Tackle", s: true}, {t: "Forced Wide", s: true}, {t: "Fouled / Stroke Risk", s: false}]
+                },
+                breakdowns: {
+                    biomechanics: [
+                        "Forward momentum vector perfectly aligned with the attacker's primary shooting hip.",
+                        "Braking stride length was shortened by 20cm, causing a slight slide overcommit past the optimal stopping mark.",
+                        "Shoulder girdle squared up efficiently to maximize surface area coverage during the spread technique."
+                    ],
+                    hands: [
+                        "Both arm shields locked securely against the lateral torso lines, eliminating any 5-hole daylight.",
+                        "Stick-side glove elevated too aggressively, compromising the lower stick sweep capability.",
+                        "Synchronized upper body compression successfully smothered the ball without rebound deflection."
+                    ],
+                    recovery: [
+                        "Explosive spring from the mat surface utilized full ankle plantarflexion.",
+                        "Trunk recovery angle was slightly upright, increasing vulnerability to chipped or lifted follow-up shots.",
+                        "Immediate scanning pattern post-save covered both flanking passing lanes."
+                    ]
+                },
+                drills: [
+                    "Drill 1: 1v1 decel-and-hold drills stopping exactly at the 2.5m mark from the shooter.",
+                    "Drill 2: Rebound recovery races from prone position on the turf.",
+                    "Focus: Control braking mechanics to avoid sliding past the shooter's release window."
+                ]
+            }
+        };
+
+        const visionFactors = [
+            { label: "Clean Line of Sight", impact: "Baseline Expected" },
+            { label: "Screened by Defense", impact: "High Cognitive Load" },
+            { label: "Late Deflection", impact: "Reflex Dependent" }
+        ];
+
+        const getRandomInRange = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
+        const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // ---- ANALYSIS ENGINE ----
+        btnAnalyze.addEventListener('click', function() {
+            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Extracting Data...`;
+            btnAnalyze.disabled = true;
+
+            setTimeout(() => {
+                const playTypes = Object.keys(knowledgeBase);
+                const selectedPlayName = getRandomItem(playTypes);
+                const data = knowledgeBase[selectedPlayName];
+                const vision = getRandomItem(visionFactors);
+
+                const reactTime = getRandomInRange(data.metrics.reactRange[0], data.metrics.reactRange[1]);
+                const velocity = getRandomInRange(data.metrics.velRange[0], data.metrics.velRange[1]);
+                const depth = getRandomInRange(data.metrics.depthRange[0], data.metrics.depthRange[1]);
+                const clearance = getRandomItem(data.metrics.clearances);
+
+                document.getElementById('dyn-situation').textContent = selectedPlayName;
+                document.getElementById('dyn-vision').textContent = vision.label;
+                document.getElementById('dyn-confidence').textContent = getRandomInRange(94, 99) + '%';
+
+                document.getElementById('dyn-reaction').textContent = reactTime + 's';
+                document.getElementById('sub-reaction').textContent = reactTime < 0.20 ? "Elite Timing" : "Actionable Latency";
+                document.getElementById('sub-reaction').className = `text-[10px] font-medium ${reactTime < 0.20 ? 'text-emerald-400' : 'text-amber-400'}`;
+
+                document.getElementById('label-velocity').textContent = data.metrics.velLabel;
+                document.getElementById('dyn-velocity').textContent = velocity + ' ' + data.metrics.velUnit;
+
+                document.getElementById('dyn-depth').textContent = depth + ' m';
+                document.getElementById('sub-depth').textContent = "From goal line";
+                document.getElementById('sub-depth').className = "text-[10px] font-medium text-blue-400";
+
+                document.getElementById('dyn-clearance').textContent = clearance.t;
+                document.getElementById('sub-clearance').textContent = clearance.s ? "Safe Execution" : "Secondary Danger";
+                document.getElementById('sub-clearance').className = `text-[10px] font-medium ${clearance.s ? 'text-emerald-400' : 'text-red-400'}`;
+
+                const breakdownHTML = `
+                    <li><strong class="text-white">Biomechanical & Posture Mechanics:</strong> ${getRandomItem(data.breakdowns.biomechanics)}</li>
+                    <li><strong class="text-white">Upper Body & Stick Angle Execution:</strong> ${getRandomItem(data.breakdowns.hands)}</li>
+                    <li><strong class="text-white">Kinetic Recovery & Deceleration:</strong> ${getRandomItem(data.breakdowns.recovery)} Evaluated at a depth of ${depth}m under ${vision.label.toLowerCase()} conditions.</li>
+                `;
+                document.getElementById('dyn-breakdown').innerHTML = breakdownHTML;
+
+                const trainingHTML = data.drills.map(d => {
+                    const isFocus = d.startsWith("Focus:");
+                    return `<p><strong class="text-white">${isFocus ? "Weekly Focus:" : d.split(":")[0] + ":"}</strong> ${d.split(":")[1]}</p>`;
+                }).join('');
+                document.getElementById('dyn-training').innerHTML = trainingHTML;
+
+                resultsSection.classList.remove('hidden');
+                btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 1000);
+        });
+
+        btnReset.addEventListener('click', function() {
+            videoPreview.pause();
+            videoPreview.src = "";
+            videoPreview.load();
+            videoInput.value = ""; 
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            isDrawingMode = false;
+            canvas.classList.add('pointer-events-none');
+            canvas.classList.remove('cursor-crosshair');
+            btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
+            btnDraw.querySelector('span').textContent = "Draw";
+
+            resultsSection.classList.add('hidden');
+            playerContainer.classList.add('hidden');
+            dropZone.classList.remove('hidden');
+            btnAnalyze.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg><span>Extract Technical Data</span>`;
+            btnAnalyze.disabled = false;
+        });
+    </script>
+</body>
+</html>
