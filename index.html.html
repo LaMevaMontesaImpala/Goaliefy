@@ -1,9 +1,9 @@
 <!DOCTYPE html>
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gooalify — Elite Goalkeeper Video Intelligence</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Goaliefy | Minimalist Goalkeeper Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,435 +13,242 @@
                     colors: {
                         apple: {
                             bg: '#000000',
-                            card: '#111115',
-                            cardHover: '#1a1a20',
-                            border: '#27272a',
-                            accent: '#3b82f6',
-                            accentGlow: 'rgba(59, 130, 246, 0.15)',
-                            textMain: '#f4f4f5',
-                            textMuted: '#a1a1aa',
+                            card: '#161617',
+                            cardHover: '#1d1d1f',
+                            border: '#333336',
+                            textPrimary: '#f5f5f7',
+                            textSecondary: '#86868b',
+                            accent: '#2997ff'
                         }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: #000000;
-            color: #f4f4f5;
-            overflow-x: hidden;
+            color: #f5f5f7;
+            -webkit-font-smoothing: antialiased;
         }
         .glass-panel {
-            background: rgba(17, 17, 21, 0.75);
+            background: rgba(22, 22, 23, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-card {
-            background: rgba(24, 24, 29, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .glass-card:hover {
-            border-color: rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #27272a;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-        .glow-effect {
-            animation: pulseGlow 4s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+<body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-50 glass-panel border-b border-apple-border px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="resetToUpload()">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fa-solid fa-shield-halved text-white text-base"></i>
-            </div>
-            <div>
-                <span class="text-lg font-bold tracking-tight text-white">Gooalify</span>
-                <span class="text-xs px-2 py-0.5 ml-2 rounded-full bg-blue-500/10 text-blue-400 font-medium border border-blue-500/20">PRO GOALIE AI</span>
-            </div>
+    <!-- Header -->
+    <header class="w-full border-b border-apple-border px-6 py-4 flex items-center justify-between glass-panel sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">G</div>
+            <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
-
         <div class="flex items-center space-x-4">
-            <button onclick="switchView('upload')" id="navUploadBtn" class="text-sm font-medium text-apple-textMuted hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5">
-                <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Upload Clip
-            </button>
-            <button onclick="switchView('dashboard')" id="navDashboardBtn" class="text-sm font-medium text-apple-textMuted hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-white/5 hidden">
-                <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
-            </button>
-            <div class="h-4 w-px bg-apple-border"></div>
-            <div class="flex items-center space-x-2 bg-apple-card px-3 py-1.5 rounded-full border border-apple-border">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span class="text-xs font-medium text-apple-textMain">Daniel Hernández (45)</span>
-            </div>
+            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">Pro Goalkeeper Engine</span>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 flex flex-col">
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
 
-        <!-- VIEW 1: UPLOAD & DROP ZONE -->
-        <div id="uploadView" class="flex-1 flex flex-col items-center justify-center py-12">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-                    Elite Goalkeeper Video Intelligence.
-                </h1>
-                <p class="text-apple-textMuted text-base md:text-lg">
-                    Upload your match or training clips to instantly decode reaction times, slide execution speed, geometry angles, and professional performance metrics.
-                </p>
-            </div>
+        <!-- Intro -->
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight text-white">Análisis Táctico y Técnico de Porteros</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu vídeo, selecciona la situación de juego y obtén métricas precisas y planes de entrenamiento específicos.</p>
+        </div>
 
-            <!-- Drop Zone Box -->
-            <div id="dropZone" 
-                 class="w-full max-w-2xl h-80 rounded-3xl border-2 border-dashed border-apple-border hover:border-blue-500/50 bg-apple-card/40 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center cursor-pointer transition-all duration-300 group relative overflow-hidden shadow-2xl"
-                 ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                
-                <div class="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none"></div>
-
-                <div class="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition duration-300 shadow-inner">
-                    <i class="fa-solid fa-arrow-up-from-bracket text-3xl text-blue-400"></i>
+        <!-- Drop Zone & Tag Selector Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Upload Box (2 cols) -->
+            <div class="md:col-span-2 glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group border border-apple-border hover:border-apple-accent transition-all duration-300">
+                <div id="drop-zone" class="border-2 border-dashed border-apple-border rounded-xl p-8 text-center flex flex-col items-center justify-center cursor-pointer hover:border-apple-accent transition-colors min-h-[220px] bg-black/40">
+                    <svg class="w-10 h-10 text-apple-textSecondary mb-3 group-hover:text-apple-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-sm font-medium text-white mb-1">Arrastra tu vídeo de jugada o <span class="text-apple-accent">examina</span></p>
+                    <p class="text-xs text-apple-textSecondary">MP4, MOV o M4V (Máx. 100MB)</p>
+                    <input type="file" id="video-upload" accept="video/*" class="absolute inset-0 opacity-0 cursor-pointer">
                 </div>
 
-                <h3 class="text-xl font-semibold text-white mb-2">Drag & Drop your match video here</h3>
-                <p class="text-apple-textMuted text-sm mb-6">Supports .mp4, .mov, .webm, .m4v files</p>
+                <!-- Video Preview Player (Hidden initially) -->
+                <div id="player-container" class="hidden mt-4 space-y-3">
+                    <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border">
+                        <video id="video-preview" controls class="w-full h-full object-contain"></video>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span id="file-name" class="text-xs text-apple-textSecondary truncate max-w-[200px]"></span>
+                        <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-xs px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-sm">
+                            Ejecutar Análisis Técnico
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                <div class="flex items-center space-x-3">
-                    <label class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition shadow-lg shadow-blue-600/30 cursor-pointer">
-                        Browse Files
-                        <input type="file" id="fileInput" accept="video/*" class="hidden" onchange="handleFileSelect(event)">
-                    </label>
+            <!-- Situation Tagging Selector -->
+            <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between border border-apple-border">
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Etiqueta de Situación</h3>
+                    <p class="text-xs text-apple-textSecondary">Selecciona la tipología de la acción para calibrar los parámetros de análisis:</p>
+                    
+                    <div class="space-y-2" id="tag-selector">
+                        <label class="flex items-center space-x-3 p-2.5 rounded-xl bg-black/40 border border-apple-border cursor-pointer hover:border-apple-accent transition-all">
+                            <input type="radio" name="play-tag" value="pc" checked class="text-apple-accent focus:ring-0">
+                            <span class="text-sm font-medium text-white">Penalty Corner (Rush/Arrastrada)</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-2.5 rounded-xl bg-black/40 border border-apple-border cursor-pointer hover:border-apple-accent transition-all">
+                            <input type="radio" name="play-tag" value="fondo" class="text-apple-accent focus:ring-0">
+                            <span class="text-sm font-medium text-white">Entrada Fondo / Centro</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-2.5 rounded-xl bg-black/40 border border-apple-border cursor-pointer hover:border-apple-accent transition-all">
+                            <input type="radio" name="play-tag" value="palo" class="text-apple-accent focus:ring-0">
+                            <span class="text-sm font-medium text-white">Salida Palo / 1v1</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-2.5 rounded-xl bg-black/40 border border-apple-border cursor-pointer hover:border-apple-accent transition-all">
+                            <input type="radio" name="play-tag" value="reflejos" class="text-apple-accent focus:ring-0">
+                            <span class="text-sm font-medium text-white">Parada de Reflejos / Blocaje</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-apple-border">
+                    <p class="text-[11px] text-apple-textSecondary leading-relaxed">El motor prioriza lectura de espacios, economía de gestos y eficacia en el despeje.</p>
                 </div>
             </div>
         </div>
 
-        <!-- VIEW 2: ANALYSIS DASHBOARD -->
-        <div id="dashboardView" class="flex-1 flex flex-col space-y-6 hidden">
-            
-            <!-- Top Bar with Back & Clip Info -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-4 rounded-2xl">
-                <div class="flex items-center space-x-4">
-                    <button onclick="resetToUpload()" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-apple-textMuted hover:text-white transition">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h2 id="currentClipTitle" class="text-lg font-bold text-white">Penalty-Egara.mp4</h2>
-                            <span id="clipCategoryBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">Penalty Corner Defense</span>
-                        </div>
-                        <p class="text-xs text-apple-textMuted mt-0.5">Analyzed via Gooalify Goalkeeper Computer Vision v2.4</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-3">
-                    <button onclick="triggerNewAnalysis()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition border border-apple-border">
-                        <i class="fa-solid fa-rotate-right mr-2"></i> Analyze Another Clip
-                    </button>
-                    <button onclick="exportReport()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition shadow-lg shadow-blue-600/30">
-                        <i class="fa-solid fa-download mr-2"></i> Export Report
-                    </button>
-                </div>
-            </div>
-
-            <!-- Main Dashboard Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Analysis Results Dashboard (Hidden until analyzed) -->
+        <div id="results-section" class="hidden space-y-6">
+            <div class="border-t border-apple-border pt-6">
+                <h2 class="text-xl font-bold text-white mb-4">Informe de Rendimiento Técnico</h2>
                 
-                <!-- Left Column: Video Preview & Key KPIs (2 cols on large) -->
-                <div class="lg:col-span-2 flex flex-col space-y-6">
-                    
-                    <!-- Video Simulated Player Box -->
-                    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl relative group flex flex-col">
-                        <div class="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
-                            <!-- Real HTML5 Video Player -->
-                            <video id="userVideoElement" class="w-full h-full object-contain bg-black" controls></video>
-                            
-                            <!-- Overlay AI Tracking Elements -->
-                            <div class="absolute inset-0 z-20 pointer-events-none p-6 flex flex-col justify-between">
-                                <div class="flex justify-between items-start">
-                                    <div class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center space-x-2">
-                                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-                                        <span id="aiTrackingStatus" class="text-xs font-mono text-white">ANALYZING GOALIE PERFORMANCE</span>
-                                    </div>
-                                    <div class="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono text-apple-textMuted">
-                                        VISION: <span class="text-white">ACTIVE</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mini Info Bar under player -->
-                        <div class="p-4 bg-apple-card/80 border-t border-apple-border flex items-center justify-between text-xs">
-                            <span class="text-apple-textMuted font-medium">Uploaded File Active in Player</span>
-                            <span id="videoDurationBadge" class="text-blue-400 font-mono font-medium">Ready</span>
-                        </div>
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                        <span class="text-xs text-apple-textSecondary">Tiempo de Reacción</span>
+                        <p class="text-2xl font-bold text-white mt-1" id="metric-reaction">0.18s</p>
+                        <span class="text-[10px] text-emerald-400 font-medium">Óptimo (Umbral Élite)</span>
                     </div>
-
-                    <!-- Key Performance Indicators (KPIs) Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Save Efficiency</span>
-                            <div class="my-2">
-                                <span id="kpiEfficiency" class="text-3xl font-bold text-white tracking-tight">88%</span>
-                                <span class="text-xs text-emerald-400 font-medium block mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+4% vs league avg</span>
-                            </div>
-                        </div>
-
-                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Slide Speed</span>
-                            <div class="my-2">
-                                <span id="kpiSlideSpeed" class="text-3xl font-bold text-white tracking-tight">0.24s</span>
-                                <span class="text-xs text-blue-400 font-medium block mt-1"><i class="fa-solid fa-bolt mr-1"></i>Explosive impulse</span>
-                            </div>
-                        </div>
-
-                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Reaction Time</span>
-                            <div class="my-2">
-                                <span id="kpiReaction" class="text-3xl font-bold text-white tracking-tight">185ms</span>
-                                <span class="text-xs text-emerald-400 font-medium block mt-1"><i class="fa-solid fa-check mr-1"></i>Elite Tier</span>
-                            </div>
-                        </div>
-
-                        <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
-                            <span class="text-xs font-medium text-apple-textMuted uppercase tracking-wider">Scramble Control</span>
-                            <div class="my-2">
-                                <span id="kpiScramble" class="text-3xl font-bold text-white tracking-tight">76%</span>
-                                <span class="text-xs text-amber-400 font-medium block mt-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Rebound watch</span>
-                            </div>
-                        </div>
+                    <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                        <span class="text-xs text-apple-textSecondary">Velocidad Slide</span>
+                        <p class="text-2xl font-bold text-white mt-1" id="metric-slide">1.42 m/s</p>
+                        <span class="text-[10px] text-emerald-400 font-medium">Estabilidad Alta</span>
                     </div>
-
+                    <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                        <span class="text-xs text-apple-textSecondary">Cobertura Angular</span>
+                        <p class="text-2xl font-bold text-white mt-1" id="metric-coverage">94.2%</p>
+                        <span class="text-[10px] text-emerald-400 font-medium">Bloqueo de Ángulos</span>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-apple-border">
+                        <span class="text-xs text-apple-textSecondary">Limpieza Despeje</span>
+                        <p class="text-2xl font-bold text-white mt-1" id="metric-clearance">Controlado</p>
+                        <span class="text-[10px] text-blue-400 font-medium">Sin rebote peligroso</span>
+                    </div>
                 </div>
-
-                <!-- Right Column: Technical Breakdown Cards & Pro Benchmark -->
-                <div class="flex flex-col space-y-6">
-                    
-                    <!-- Pro Benchmark Card -->
-                    <div class="glass-card p-6 rounded-3xl relative overflow-hidden">
-                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-apple-textMuted">Pro Benchmark Match</h3>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold">92% MATCH</span>
-                        </div>
-                        <div class="flex items-center space-x-4 mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-lg text-white shadow-lg">
-                                TS
-                            </div>
-                            <div>
-                                <h4 class="text-base font-bold text-white">Tony Santiago Profile</h4>
-                                <p class="text-xs text-apple-textMuted">High correlation in explosive 1v1 slide & proactive stick sweep.</p>
-                            </div>
-                        </div>
-                        <div class="w-full bg-apple-border h-2 rounded-full overflow-hidden mb-2">
-                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full w-[92%] rounded-full"></div>
-                        </div>
-                        <p class="text-xs text-apple-textMuted italic">"Exceptional anticipation timing and stick clearance under pressure."</p>
-                    </div>
-
-                    <!-- Technical Breakdown Cards -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col space-y-5">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-apple-textMuted">Technical Breakdown</h3>
-
-                        <!-- Card 1 -->
-                        <div class="space-y-2 pb-4 border-b border-apple-border">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-semibold text-white flex items-center">
-                                    <i class="fa-solid fa-hockey-stick text-blue-400 mr-2"></i> Slide & Stick Sweep
-                                </span>
-                                <span id="techSlideScore" class="text-xs font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10">9.2 / 10</span>
-                            </div>
-                            <p id="techSlideDesc" class="text-xs text-apple-textMuted leading-relaxed">
-                                Proactive sweep timing is optimal. Stick is extended at full reach to deflect the ball away from the danger zone before forward contact.
-                            </p>
-                        </div>
-
-                        <!-- Card 2 -->
-                        <div class="space-y-2 pb-4 border-b border-apple-border">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-semibold text-white flex items-center">
-                                    <i class="fa-solid fa-ruler-combined text-blue-400 mr-2"></i> Post & Angle Geometry
-                                </span>
-                                <span id="techGeometryScore" class="text-xs font-bold text-blue-400 px-2 py-0.5 rounded bg-blue-500/10">8.8 / 10</span>
-                            </div>
-                            <p id="techGeometryDesc" class="text-xs text-apple-textMuted leading-relaxed">
-                                Exceptional positioning along the bisectrix. Shoulders perfectly squared to the initial shot vector, closing near-post angles cleanly.
-                            </p>
-                        </div>
-
-                        <!-- Card 3 -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm font-semibold text-white flex items-center">
-                                    <i class="fa-solid fa-arrows-split-up-and-left text-blue-400 mr-2"></i> Rebound & Scramble
-                                </span>
-                                <span id="techReboundScore" class="text-xs font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-500/10">7.5 / 10</span>
-                            </div>
-                            <p id="techReboundDesc" class="text-xs text-apple-textMuted leading-relaxed">
-                                Recovery speed after the slide can be tightened by 0.1s to avoid second-chance scrambles in heavy goalmouth traffic.
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
 
+            <!-- Relevant Technical Breakdown & Training Advice -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Breakdown -->
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-apple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Detalles Técnicos Relevantes</span>
+                    </h3>
+                    <ul class="space-y-3 text-xs text-apple-textSecondary" id="technical-details">
+                        <li class="flex items-start space-x-2">
+                            <span class="text-apple-accent font-bold">•</span>
+                            <span><strong>Posición de set:</strong> Centro de gravedad bajo con flexión óptima de rodillas previo al impacto.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-apple-accent font-bold">•</span>
+                            <span><strong>Orientación del stick:</strong> Ángulo de plancha correcto para derivar la trayectoria hacia la banda lateral.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-apple-accent font-bold">•</span>
+                            <span><strong>Tempo de salida:</strong> Anticipación milimétrica sin comprometer la verticalidad del tronco.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Training Recommendations -->
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>Consejos y Propuesta de Entrenamiento</span>
+                    </h3>
+                    <div class="space-y-3 text-xs text-apple-textSecondary" id="training-advice">
+                        <p class="leading-relaxed"><strong class="text-white">Ejercicio de refuerzo semanal:</strong> Trabajar series de 8 repeticiones de velocidad de reacción en suelo sintético seco con arranques cortos de 2 metros en diagonal.</p>
+                        <p class="leading-relaxed"><strong class="text-white">Foco correctivo:</strong> Mantener la mano libre firme y pegada al cuerpo en la fase final del deslizamiento para asegurar control total del rebote.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methodology Reference Section -->
+        <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Metodología de Medición Goaliefy</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-apple-textSecondary">
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">⏱️ Tiempo de Reacción</strong>
+                    Mide el intervalo en milisegundos desde el punto de impacto del stick rival hasta la primera respuesta muscular visible del portero.
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">📐 Cobertura Angular</strong>
+                    Calcula el porcentaje de ocupación geométrica de la portería respecto a la línea de disparo del atacante.
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">🏒 Eficacia de Despeje</strong>
+                    Evalúa si el balón es contenido, desviado a zonas seguras (laterales) o si genera rechaces peligrosos en el área.
+                </div>
+            </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="glass-panel border-t border-apple-border py-6 px-6 text-center text-xs text-apple-textMuted">
-        <p>&copy; 2026 Gooalify Intelligence. Built for elite field hockey goalkeepers. Inspired by Apple design precision.</p>
+    <footer class="w-full border-t border-apple-border py-6 px-6 text-center text-xs text-apple-textSecondary mt-auto">
+        <p>&copy; 2026 Goaliefy. Diseñado para porteros de máxima exigencia.</p>
     </footer>
 
-    <!-- JavaScript Application Logic -->
+    <!-- Script para Interactividad -->
     <script>
-        function switchView(viewName) {
-            const uploadView = document.getElementById('uploadView');
-            const dashboardView = document.getElementById('dashboardView');
-            const navUploadBtn = document.getElementById('navUploadBtn');
-            const navDashboardBtn = document.getElementById('navDashboardBtn');
+        const dropZone = document.getElementById('drop-zone');
+        const videoInput = document.getElementById('video-upload');
+        const playerContainer = document.getElementById('player-container');
+        const videoPreview = document.getElementById('video-preview');
+        const fileNameSpan = document.getElementById('file-name');
+        const btnAnalyze = document.getElementById('btn-analyze');
+        const resultsSection = document.getElementById('results-section');
 
-            const videoEl = document.getElementById('userVideoElement');
-
-            if (viewName === 'upload') {
-                uploadView.classList.remove('hidden');
-                dashboardView.classList.add('hidden');
-                navUploadBtn.classList.add('text-white', 'bg-white/5');
-                navUploadBtn.classList.remove('text-apple-textMuted');
-                navDashboardBtn.classList.add('hidden');
-                if (videoEl) {
-                    videoEl.pause();
-                    videoEl.src = "";
-                }
-            } else {
-                uploadView.classList.add('hidden');
-                dashboardView.classList.remove('hidden');
-                navDashboardBtn.classList.remove('hidden');
-                navDashboardBtn.classList.add('text-white', 'bg-white/5');
-                navUploadBtn.classList.remove('text-white', 'bg-white/5');
-                navUploadBtn.classList.add('text-apple-textMuted');
-            }
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const dropZone = document.getElementById('dropZone');
-            dropZone.classList.add('border-blue-500', 'bg-blue-500/10');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const dropZone = document.getElementById('dropZone');
-            dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const dropZone = document.getElementById('dropZone');
-            dropZone.classList.remove('border-blue-500', 'bg-blue-500/10');
-            
-            const files = e.dataTransfer.files;
-            if (files && files.length > 0) {
-                processVideoFile(files[0]);
-            }
-        }
-
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
+        // Manejar subida de archivo
+        videoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
-                processVideoFile(file);
+                const fileURL = URL.createObjectURL(file);
+                videoPreview.src = fileURL;
+                fileNameSpan.textContent = file.name;
+                dropZone.classList.add('hidden');
+                playerContainer.classList.remove('hidden');
             }
-        }
+        });
 
-        function processVideoFile(file) {
-            if (!file.type.startsWith('video/')) {
-                showNotification('Please upload a valid video file (.mp4, .mov, etc.)', 'amber');
-                return;
-            }
+        // Simular análisis al hacer clic en el botón
+        btnAnalyze.addEventListener('click', function() {
+            btnAnalyze.textContent = 'Procesando fotogramas...';
+            btnAnalyze.disabled = true;
 
-            document.getElementById('currentClipTitle').innerText = file.name;
-            document.getElementById('clipCategoryBadge').innerText = "Custom Upload Video";
-
-            const videoUrl = URL.createObjectURL(file);
-            const videoEl = document.getElementById('userVideoElement');
-            videoEl.src = videoUrl;
-            videoEl.load();
-
-            // Generate randomized dynamic metrics for the uploaded video to simulate AI analysis
-            const randomEff = Math.floor(Math.random() * 8) + 88; // 88 - 95%
-            const randomSpeed = (Math.random() * 0.08 + 0.18).toFixed(2) + 's';
-            const randomReact = Math.floor(Math.random() * 25) + 165 + 'ms';
-            const randomScramble = Math.floor(Math.random() * 12) + 78 + '%';
-
-            document.getElementById('kpiEfficiency').innerText = randomEff + '%';
-            document.getElementById('kpiSlideSpeed').innerText = randomSpeed;
-            document.getElementById('kpiReaction').innerText = randomReact;
-            document.getElementById('kpiScramble').innerText = randomScramble;
-
-            document.getElementById('techSlideScore').innerText = (randomEff / 10).toFixed(1) + ' / 10';
-            document.getElementById('techGeometryScore').innerText = ((randomEff - 2) / 10).toFixed(1) + ' / 10';
-            document.getElementById('techReboundScore').innerText = ((randomEff - 6) / 10).toFixed(1) + ' / 10';
-
-            switchView('dashboard');
-            videoEl.play().catch(e => console.log("Autoplay prevented:", e));
-        }
-
-        function triggerNewAnalysis() {
-            switchView('upload');
-        }
-
-        function exportReport() {
-            showNotification('Gooalify PDF Analysis Report successfully generated!', 'blue');
-        }
-
-        function showNotification(message, color) {
-            const notif = document.createElement('div');
-            notif.className = `fixed bottom-8 right-8 z-50 glass-card bg-${color}-600/90 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-${color}-400/30 animate-bounce`;
-            notif.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i><span>${message}</span>`;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3500);
-        }
-
-        window.onload = function() {
-            switchView('upload');
-        };
+            setTimeout(() => {
+                resultsSection.classList.remove('hidden');
+                btnAnalyze.textContent = 'Análisis Completado';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        });
     </script>
 </body>
 </html>
