@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goaliefy | Precision Goalkeeper Intelligence</title>
+    <title>Goaliefy | Pro Goalkeeper Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -38,34 +38,6 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        /* Custom styling for the goal map visual */
-        .goal-frame {
-            border: 6px solid #f5f5f7;
-            border-bottom: 2px dashed #86868b;
-            border-radius: 8px 8px 0 0;
-            position: relative;
-            aspect-ratio: 21.4 / 7; /* Approximate hockey goal ratio 3.66m x 2.14m */
-            width: 100%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 100%);
-        }
-        .shot-dot {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            background-color: #ef4444; /* Red */
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-            z-index: 10;
-        }
-        .clearance-line {
-            position: absolute;
-            height: 2px;
-            background: linear-gradient(90deg, #ef4444 0%, #10b981 100%);
-            transform-origin: left center;
-            z-index: 5;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
@@ -80,21 +52,20 @@
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
         <div class="flex items-center space-x-4">
-            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">Pro Analytics Engine</span>
+            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">AI Intelligence</span>
         </div>
     </header>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
         
         <div class="text-center space-y-2">
-            <h1 class="text-3xl font-bold tracking-tight text-white">Precision Performance Breakdown</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Upload footage to access frame-by-frame analysis, spatial positioning metrics, and data-driven feedback tailored to your exact execution.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-white">Advanced Goalkeeper Video Analysis</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Upload footage to access precision video controls, on-screen telestrator annotations, and deep technical breakdowns.</p>
         </div>
 
         <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
             
-            <!-- Robust Drag & Drop Label -->
             <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
                 <div class="pointer-events-none flex flex-col items-center">
                     <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,307 +81,3 @@
             <div id="player-container" class="hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span id="file-name" class="text-xs font-medium text-apple-textSecondary"></span>
-                    </div>
-                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer z-50">
-                        Upload Next Video
-                    </button>
-                </div>
-
-                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center group">
-                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
-                </div>
-
-                <!-- NEW: Precision Video Control Bar -->
-                <div class="flex items-center justify-center p-3 bg-black/60 border border-apple-border rounded-xl space-x-4">
-                    <div class="flex items-center space-x-2 border-r border-apple-border pr-4">
-                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Speed</span>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Frame</span>
-                        <button id="btn-frame-prev" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
-                            <span>-1</span>
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <button id="btn-frame-next" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            <span>+1</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="action-bar" class="flex justify-center pt-2">
-                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        <span>Extract Technical Data</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dynamic Results Dashboard -->
-        <div id="results-section" class="hidden space-y-6">
-            
-            <!-- Context Banner (Replaces imprecise AI tags) -->
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Vision & Context Factor:</span>
-                    <span id="dyn-vision" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                </div>
-                <span class="text-xs text-apple-textSecondary">Impact: <strong id="dyn-impact" class="text-white">-</strong></span>
-            </div>
-
-            <!-- Upgraded Metrics Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Reaction Time</span>
-                    <p id="dyn-reaction" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span id="sub-reaction" class="text-[10px] font-medium">-</span>
-                </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Action Velocity</span>
-                    <p id="dyn-velocity" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span id="sub-velocity" class="text-[10px] text-emerald-400 font-medium">Kinetic output</span>
-                </div>
-                <!-- NEW: Depth Metric -->
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Depth Positioning</span>
-                    <p id="dyn-depth" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span id="sub-depth" class="text-[10px] font-medium">-</span>
-                </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Clearance Zone</span>
-                    <p id="dyn-clearance" class="text-lg font-bold text-white mt-1 leading-tight">-</p>
-                    <span id="sub-clearance" class="text-[10px] font-medium">-</span>
-                </div>
-            </div>
-
-            <!-- Breakdown & Shot Map -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- NEW: Shot Placement Map -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4 flex flex-col">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Shot Placement Map</h3>
-                    <p class="text-xs text-apple-textSecondary mb-2">Visualizing ball trajectory and resulting clearance vector.</p>
-                    
-                    <div class="flex-1 flex items-center justify-center px-4 pb-4">
-                        <div class="goal-frame" id="goal-frame">
-                            <div class="shot-dot" id="shot-dot"></div>
-                            <div class="clearance-line" id="clearance-line"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Deep Breakdown -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Technical Breakdown</h3>
-                    <ul id="dyn-breakdown" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <!-- Injected via JS -->
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-        
-    </main>
-
-    <script>
-        const dropZone = document.getElementById('drop-zone');
-        const videoInput = document.getElementById('video-upload');
-        const playerContainer = document.getElementById('player-container');
-        const videoPreview = document.getElementById('video-preview');
-        const fileNameSpan = document.getElementById('file-name');
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnReset = document.getElementById('btn-reset');
-        const resultsSection = document.getElementById('results-section');
-
-        // ---- PRECISION VIDEO CONTROLS ----
-        const speedBtns = document.querySelectorAll('.speed-btn');
-        speedBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const speed = parseFloat(e.target.dataset.speed);
-                videoPreview.playbackRate = speed;
-                
-                // Update UI
-                speedBtns.forEach(b => {
-                    b.classList.remove('bg-apple-accent');
-                    b.classList.add('bg-apple-card');
-                });
-                e.target.classList.remove('bg-apple-card');
-                e.target.classList.add('bg-apple-accent');
-            });
-        });
-
-        // Frame by frame assumes ~30fps (0.033s per frame)
-        const frameStep = 0.033; 
-        document.getElementById('btn-frame-prev').addEventListener('click', () => {
-            videoPreview.pause();
-            videoPreview.currentTime = Math.max(0, videoPreview.currentTime - frameStep);
-        });
-        document.getElementById('btn-frame-next').addEventListener('click', () => {
-            videoPreview.pause();
-            videoPreview.currentTime = Math.min(videoPreview.duration, videoPreview.currentTime + frameStep);
-        });
-
-        // ---- KNOWLEDGE BASE (DYNAMIC GENERATOR) ----
-        const contextFactors = [
-            { label: "Clean Line of Sight", impact: "Baseline Standard" },
-            { label: "Screened by Defense", impact: "High Cognitive Load" },
-            { label: "Late Deflection", impact: "Extreme Reflex Required" }
-        ];
-
-        const clearances = [
-            { text: "Clean Sideline", safe: true },
-            { text: "Trapped / Smothered", safe: true },
-            { text: "Top of D Rebound", safe: false },
-            { text: "High Aerial Danger", safe: false }
-        ];
-
-        const positioningFeedback = [
-            "Excellent low-base center of gravity maintained at the point of injection.",
-            "Weight slightly back on the heels, delaying the explosive forward thrust.",
-            "Perfect bisector alignment relative to the ball carrier's stick.",
-            "Hips opened too early, exposing the five-hole trajectory."
-        ];
-
-        const handsFeedback = [
-            "Left glove positioned high and active, sealing the roof zone.",
-            "Stick angle flattened perfectly to redirect kinetic energy safely wide.",
-            "Dropped hands prematurely before reading the ball flight.",
-            "Strong forearm block, locking the rebound dead against the body."
-        ];
-
-        // Utils
-        const getRandomInRange = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
-        const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        
-        // ---- DRAG AND DROP LOGIC ----
-        window.addEventListener('dragover', e => e.preventDefault());
-        window.addEventListener('drop', e => e.preventDefault());
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-apple-accent', 'bg-apple-card');
-        });
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
-        });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                videoInput.files = e.dataTransfer.files;
-                videoInput.dispatchEvent(new Event('change'));
-            }
-        });
-        dropZone.addEventListener('click', () => videoInput.click());
-
-        videoInput.addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                const file = files[0];
-                if (file.type.startsWith('video/')) {
-                    const fileURL = URL.createObjectURL(file);
-                    videoPreview.src = fileURL;
-                    videoPreview.load(); 
-                    fileNameSpan.textContent = file.name;
-                    dropZone.classList.add('hidden');
-                    playerContainer.classList.remove('hidden');
-                } else {
-                    alert("Please upload a valid video file.");
-                }
-            }
-        });
-
-        // ---- ANALYSIS ENGINE ----
-        btnAnalyze.addEventListener('click', function() {
-            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Extracting Data...`;
-            btnAnalyze.disabled = true;
-
-            setTimeout(() => {
-                // Generate Dynamic Metrics
-                const context = getRandomItem(contextFactors);
-                const reactTime = getRandomInRange(0.14, 0.29);
-                const velocity = getRandomInRange(1.0, 2.5);
-                const depth = getRandomInRange(0.5, 3.5); // Meters from goal line
-                const clearance = getRandomItem(clearances);
-
-                // Populate Context
-                document.getElementById('dyn-vision').textContent = context.label;
-                document.getElementById('dyn-impact').textContent = context.impact;
-
-                // Populate Grids
-                document.getElementById('dyn-reaction').textContent = reactTime + 's';
-                document.getElementById('sub-reaction').textContent = reactTime < 0.20 ? "Elite Timing" : "Actionable Latency";
-                document.getElementById('sub-reaction').className = `text-[10px] font-medium ${reactTime < 0.20 ? 'text-emerald-400' : 'text-amber-400'}`;
-
-                document.getElementById('dyn-velocity').textContent = velocity + ' m/s';
-
-                document.getElementById('dyn-depth').textContent = depth + ' m';
-                document.getElementById('sub-depth').textContent = depth > 2.0 ? "Aggressive Cut-Down" : "Deep Posture";
-                document.getElementById('sub-depth').className = `text-[10px] font-medium ${depth > 2.0 ? 'text-blue-400' : 'text-emerald-400'}`;
-
-                document.getElementById('dyn-clearance').textContent = clearance.text;
-                document.getElementById('sub-clearance').textContent = clearance.safe ? "Safe Execution" : "Secondary Danger";
-                document.getElementById('sub-clearance').className = `text-[10px] font-medium ${clearance.safe ? 'text-emerald-400' : 'text-red-400'}`;
-
-                // Populate Breakdown
-                const breakdownHTML = `
-                    <li><strong class="text-white">Positioning:</strong> ${getRandomItem(positioningFeedback)} Depth measured at ${depth}m from the line.</li>
-                    <li><strong class="text-white">Contact & Hands:</strong> ${getRandomItem(handsFeedback)}</li>
-                `;
-                document.getElementById('dyn-breakdown').innerHTML = breakdownHTML;
-
-                // ---- GOAL MAP VISUALIZATION ----
-                // Randomize target coordinates (0% to 100% of the goal width/height)
-                const shotX = Math.floor(Math.random() * 90) + 5; // Keep away from absolute edges
-                const shotY = Math.floor(Math.random() * 90) + 5;
-                
-                const dot = document.getElementById('shot-dot');
-                dot.style.left = `${shotX}%`;
-                dot.style.top = `${shotY}%`;
-
-                // Draw clearance vector line based on safety
-                const line = document.getElementById('clearance-line');
-                line.style.left = `${shotX}%`;
-                line.style.top = `${shotY}%`;
-                line.style.width = '60px'; // Length of vector arrow
-                
-                // If safe, point outwards (0 or 180 deg). If dangerous, point inwards.
-                let angle;
-                if (clearance.safe) {
-                    angle = shotX > 50 ? -30 : -150; // Deflect towards nearest sideline
-                    line.style.background = 'linear-gradient(90deg, #ef4444 0%, #10b981 100%)'; // Red to Green
-                } else {
-                    angle = 90; // Deflect straight back out (dangerous rebound)
-                    line.style.background = 'linear-gradient(90deg, #ef4444 0%, #f59e0b 100%)'; // Red to Orange/Warning
-                }
-                line.style.transform = `translate(-5%, -50%) rotate(${angle}deg)`;
-
-                // Show Results
-                resultsSection.classList.remove('hidden');
-                btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 1000);
-        });
-
-        // Reset
-        btnReset.addEventListener('click', function() {
-            videoPreview.pause();
-            videoPreview.src = "";
-            videoPreview.load();
-            videoInput.value = ""; 
-            resultsSection.classList.add('hidden');
-            playerContainer.classList.add('hidden');
-            dropZone.classList.remove('hidden');
-            btnAnalyze.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg><span>Extract Technical Data</span>`;
-            btnAnalyze.disabled = false;
-        });
-    </script>
-</body>
-</html>
