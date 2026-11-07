@@ -38,7 +38,6 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        #drop-zone { transition: all 0.2s ease; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
@@ -46,7 +45,7 @@
     <!-- Header -->
     <header class="w-full border-b border-apple-border px-6 py-4 flex items-center justify-between glass-panel sticky top-0 z-50">
         <div class="flex items-center space-x-3">
-            <!-- New Goaliefy Logo: Shield + G -->
+            <!-- Logo: Escudo con la 'G' -->
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 4L6 8V15C6 21.5 10.3 27.5 16 30C21.7 27.5 26 21.5 26 15V8L16 4Z" fill="#2997ff"/>
                 <path d="M20 14C19.2 12.2 17.7 11 16 11C13.2 11 11 13.2 11 16C11 18.8 13.2 21 16 21C18.8 21 21 18.8 21 16H16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -67,19 +66,20 @@
         </div>
 
         <!-- Upload & Player Section -->
-        <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden">
+        <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
             
-            <!-- Dropzone -->
-            <div id="drop-zone" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40">
-                <svg class="w-12 h-12 text-apple-textSecondary mb-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <p class="text-base font-medium text-white mb-1 pointer-events-none">Drag & drop video here, or <span class="text-apple-accent underline">browse files</span></p>
-                <p class="text-xs text-apple-textSecondary pointer-events-none">MP4, MOV, M4V (High Definition supported)</p>
-                
-                <!-- Hidden Input -->
+            <!-- Dropzone 100% Nativo (Usando <label> en lugar de <div>) -->
+            <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
+                <!-- pointer-events-none asegura que el texto interior no interrumpa el arrastre -->
+                <div class="pointer-events-none flex flex-col items-center">
+                    <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p class="text-base font-medium text-white mb-1">Drag & drop video here, or <span class="text-apple-accent underline">browse files</span></p>
+                    <p class="text-xs text-apple-textSecondary">MP4, MOV, M4V (High Definition supported)</p>
+                </div>
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-m4v,video/*" class="hidden">
-            </div>
+            </label>
 
             <!-- Video Player -->
             <div id="player-container" class="hidden space-y-4">
@@ -134,4 +134,150 @@
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Clearance Control</span>
-                    <p class="text-
+                    <p class="text-2xl font-bold text-white mt-1">Clean Sideline</p>
+                    <span class="text-[10px] text-blue-400 font-medium">Zero Dangerous Rebounds</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Deep Technical Breakdown</h3>
+                    <ul class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                        <li><strong class="text-white">Set Position:</strong> Excellent low-base weight distribution prior to the injection push. Knees flexed perfectly within the lateral axis.</li>
+                        <li><strong class="text-white">Stick Angle:</strong> The composite flat edge maintained a precise 45-degree redirection angle, neutralizing the direct drag-flick trajectory.</li>
+                        <li><strong class="text-white">Recovery:</strong> Controlled torso alignment during the slide exit phase, allowing immediate recovery without losing sight of secondary threats.</li>
+                    </ul>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-emerald-400">Personalized Training Plan</h3>
+                    <div class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                        <p><strong class="text-white">Drill 1: Explosive 3m Rush-Outs.</strong> 4 series of 6 reps on dry turf. Emphasize leading with the helmet and committing the left shoulder instantly.</p>
+                        <p><strong class="text-white">Drill 2: Stick-Side Rebound Suppression.</strong> Trap high-velocity low drag-flicks with the forearm guard locked against the ribs to eliminate loose rebounds.</p>
+                        <p><strong class="text-white">Focus:</strong> Ankle mobility routines to shave off 0.02s in initial lateral push-off acceleration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Goaliefy Algorithmic Methodology</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-apple-textSecondary">
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">⏱️ Reaction Timing</strong> Computed from the exact video frame of stick-ball impact to the initial muscular contraction vector.
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">📐 Angular Coverage</strong> Calculates geometrical net occupancy relative to the attacker's shooting vector.
+                </div>
+                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
+                    <strong class="text-white block mb-1">🏒 Clearance Efficiency</strong> Classifies whether the ball is safely redirected to flanks or creates dangerous secondary scrambles.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const videoInput = document.getElementById('video-upload');
+        const playerContainer = document.getElementById('player-container');
+        const videoPreview = document.getElementById('video-preview');
+        const fileNameSpan = document.getElementById('file-name');
+        const btnAnalyze = document.getElementById('btn-analyze');
+        const btnReset = document.getElementById('btn-reset');
+        const resultsSection = document.getElementById('results-section');
+        const aiTagBadge = document.getElementById('ai-tag-badge');
+
+        const tagsList = [
+            "Penalty Corner (Rush Defense)",
+            "Baseline Drive & Cut-Back",
+            "Post Close-Out / 1v1 Isolation",
+            "Reflex Save & High Aerial Control"
+        ];
+
+        // 1. Bloqueo ABSOLUTO de toda la ventana para evitar que el navegador abra el archivo por error
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop', e => e.preventDefault());
+
+        // 2. Efectos visuales de la caja al pasar el ratón con un archivo
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-apple-accent', 'bg-apple-card');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
+        });
+
+        // 3. Captura manual del archivo al soltarlo (Solución definitiva del Drag & Drop)
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
+            
+            // Asignamos el archivo soltado al input oculto manualmente
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                videoInput.files = e.dataTransfer.files;
+                // Disparamos el evento 'change' nativo para que el input haga su trabajo
+                videoInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // 4. Lógica de procesamiento (se ejecuta tanto por clic/explorador como por drag & drop)
+        videoInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            
+            if (files && files.length > 0) {
+                const file = files[0];
+                
+                if (file.type.startsWith('video/')) {
+                    const fileURL = URL.createObjectURL(file);
+                    videoPreview.src = fileURL;
+                    videoPreview.load(); 
+                    fileNameSpan.textContent = file.name;
+                    
+                    dropZone.classList.add('hidden');
+                    playerContainer.classList.remove('hidden');
+                } else {
+                    alert("Please upload a valid video file (MP4, MOV).");
+                }
+            }
+        });
+
+        // Botón de Análisis
+        btnAnalyze.addEventListener('click', function() {
+            btnAnalyze.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing Frames...
+            `;
+            btnAnalyze.disabled = true;
+
+            setTimeout(() => {
+                aiTagBadge.textContent = tagsList[Math.floor(Math.random() * tagsList.length)];
+                resultsSection.classList.remove('hidden');
+                btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        });
+
+        // Botón de Reset
+        btnReset.addEventListener('click', function() {
+            videoPreview.pause();
+            videoPreview.src = "";
+            videoPreview.load();
+            videoInput.value = ""; 
+            
+            resultsSection.classList.add('hidden');
+            playerContainer.classList.add('hidden');
+            dropZone.classList.remove('hidden');
+            
+            btnAnalyze.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <span>Run AI Technical Analysis</span>
+            `;
+            btnAnalyze.disabled = false;
+        });
+    </script>
+</body>
+</html>
