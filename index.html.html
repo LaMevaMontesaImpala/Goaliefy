@@ -52,12 +52,7 @@
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
         <div class="flex items-center space-x-4">
-            <!-- Gemini API Config Pill -->
-            <div class="hidden sm:flex items-center space-x-2 bg-apple-card px-3 py-1.5 rounded-lg border border-apple-border">
-                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <input type="password" id="gemini-key" placeholder="Gemini API Key (Optional)" class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-36">
-            </div>
-            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">AI Vision Engine</span>
+            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">CD Terrassa Engine - 15 Scenarios</span>
         </div>
     </header>
 
@@ -65,7 +60,7 @@
         
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-bold tracking-tight text-white">Field Hockey Goalkeeper Intelligence</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Upload video footage to execute AI tactical breakdown, 1-10 attribute scoring, and rigorous kinematic calculations.</p>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Upload footage to trigger autonomous AI tactical recognition, attribute scoring (1-10), and verified kinematics.</p>
         </div>
 
         <!-- Upload & Player Section -->
@@ -82,7 +77,7 @@
                 <input type="file" id="video-upload" accept="video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
             </div>
 
-            <!-- Video Player & Precision Controls -->
+            <!-- Video Player & Status -->
             <div id="player-container" class="hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
@@ -99,303 +94,23 @@
                     <canvas id="annotation-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10 touch-none"></canvas>
                 </div>
 
-                <div class="flex flex-wrap items-center justify-center p-3 bg-black/60 border border-apple-border rounded-xl gap-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Speed</span>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
-                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                <!-- AUTONOMOUS AI DETECTION STATUS BAR -->
+                <div id="ai-status-bar" class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between bg-black/60">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-apple-accent animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span id="ai-status-text" class="text-xs text-apple-textSecondary font-medium">Analizando fotogramas clave y geometría del área...</span>
                     </div>
-                    
-                    <div class="h-6 w-px bg-apple-border hidden sm:block"></div>
-
-                    <div class="flex items-center space-x-2">
-                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Annotations</span>
-                        <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1 cursor-pointer">
-                            <span>Brush</span>
-                        </button>
-                        <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition flex items-center space-x-1 cursor-pointer">
-                            <span>Clear</span>
-                        </button>
-                    </div>
+                    <span id="ai-badge" class="hidden px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">Jugada Detectada</span>
                 </div>
 
-                <div class="flex justify-center pt-2">
-                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        <span>Run AI Tactical & Kinematic Analysis</span>
+                <!-- Speed controls & Brush -->
+                <div class="flex items-center justify-center p-3 bg-black/40 border border-apple-border rounded-xl gap-4">
+                    <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Playback Speed</span>
+                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
+                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
+                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                    <div class="h-4 w-px bg-apple-border"></div>
+                    <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1 cursor-pointer">
+                        <span>Brush</span>
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Performance Evaluation Dashboard -->
-        <div id="results-section" class="hidden space-y-6">
-            
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Situation:</span>
-                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                    </div>
-                </div>
-                <div class="text-xs text-apple-textSecondary">AI Model Confidence: <strong id="dyn-conf" class="text-white">96.8%</strong></div>
-            </div>
-
-            <!-- Scoring Grid (1-10 Attributes) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Decision Making -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Toma de Decisiones (Decision Making)</span>
-                        <span id="score-decision" class="text-2xl font-bold font-mono text-apple-accent">- / 10</span>
-                    </div>
-                    <p id="desc-decision" class="text-xs text-apple-textSecondary leading-relaxed">-</p>
-                </div>
-
-                <!-- Execution -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Ejecución Técnica (Technical Execution)</span>
-                        <span id="score-execution" class="text-2xl font-bold font-mono text-emerald-400">- / 10</span>
-                    </div>
-                    <p id="desc-execution" class="text-xs text-apple-textSecondary leading-relaxed">-</p>
-                </div>
-
-            </div>
-
-            <!-- Kinematic Metrics with Calculation Explanations -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Reaction Time -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Tiempo de Reacción (Reaction Time)</span>
-                        <span id="val-reaction" class="text-xl font-bold font-mono text-white">-</span>
-                    </div>
-                    <p class="text-[11px] text-apple-textSecondary leading-relaxed border-t border-apple-border/50 pt-2">
-                        <strong class="text-white">Cómo se calcula:</strong> Medido contando la diferencia en fotogramas entre el impacto inicial del stick del atacante y el primer frame con contracción muscular o desplazamiento del centro de gravedad del portero (tasa de referencia: 30-60 fps).
-                    </p>
-                </div>
-
-                <!-- Ball Distance -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Distancia a la Bola (Ball Distance)</span>
-                        <span id="val-distance" class="text-xl font-bold font-mono text-white">-</span>
-                    </div>
-                    <p class="text-[11px] text-apple-textSecondary leading-relaxed border-t border-apple-border/50 pt-2">
-                        <strong class="text-white">Cómo se calcula:</strong> Estimado mediante triangulación de perspectiva 2D tomando como referencia la línea de gol (0m) y las dimensiones normalizadas del área de penalti de hockey hierba (radio de 14.63m).
-                    </p>
-                </div>
-
-            </div>
-
-            <!-- Optimal Success & Danger Clearance Strategy -->
-            <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider flex items-center space-x-2">
-                    <svg class="w-4 h-4 text-apple-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Estrategia Óptima para Máximo Éxito y Despeje de Peligro</span>
-                </h3>
-                <p id="dyn-strategy" class="text-xs text-apple-textSecondary leading-relaxed">-</p>
-            </div>
-        </div>
-
-        <!-- Evaluation Vault -->
-        <div id="vault-section" class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4 mt-12">
-            <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Evaluation Vault (Historial)</h3>
-                <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Clear History</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-apple-border text-[10px] uppercase tracking-wider text-apple-textSecondary">
-                            <th class="py-3 font-medium">Date</th>
-                            <th class="py-3 font-medium">Video File</th>
-                            <th class="py-3 font-medium">Situation</th>
-                            <th class="py-3 font-medium">Decision (1-10)</th>
-                            <th class="py-3 font-medium">Execution (1-10)</th>
-                            <th class="py-3 font-medium">Reaction</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vault-body" class="text-xs text-white"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const videoInput = document.getElementById('video-upload');
-        const uploadPanel = document.getElementById('upload-panel');
-        const playerContainer = document.getElementById('player-container');
-        const videoPreview = document.getElementById('video-preview');
-        const fileNameSpan = document.getElementById('file-name');
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnReset = document.getElementById('btn-reset');
-        const resultsSection = document.getElementById('results-section');
-        const vaultBody = document.getElementById('vault-body');
-
-        // Vault management
-        function loadVault() {
-            const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
-            vaultBody.innerHTML = '';
-            if (vault.length === 0) {
-                vaultBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-apple-textSecondary">No evaluations saved yet.</td></tr>`;
-                return;
-            }
-            vault.reverse().forEach(item => {
-                vaultBody.innerHTML += `
-                    <tr class="border-b border-apple-border/50">
-                        <td class="py-3 text-apple-textSecondary">${item.date}</td>
-                        <td class="py-3 font-medium truncate max-w-[120px]">${item.filename}</td>
-                        <td class="py-3"><span class="px-2 py-1 rounded bg-apple-border text-[10px]">${item.situation}</span></td>
-                        <td class="py-3 font-mono font-bold text-apple-accent">${item.decision}/10</td>
-                        <td class="py-3 font-mono font-bold text-emerald-400">${item.execution}/10</td>
-                        <td class="py-3 font-mono text-white">${item.reaction}</td>
-                    </tr>
-                `;
-            });
-        }
-        document.getElementById('btn-clear-vault').addEventListener('click', () => {
-            localStorage.removeItem('goaliefy_vault');
-            loadVault();
-        });
-        loadVault();
-
-        // Native File Handling
-        videoInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-                videoPreview.src = URL.createObjectURL(file);
-                fileNameSpan.textContent = file.name;
-                uploadPanel.classList.add('hidden');
-                playerContainer.classList.remove('hidden');
-            }
-        });
-
-        // Brush Canvas
-        const canvas = document.getElementById('annotation-canvas');
-        const ctx = canvas.getContext('2d');
-        const btnDraw = document.getElementById('btn-draw');
-        const btnClear = document.getElementById('btn-clear');
-        let isDrawingMode = false, isDrawing = false;
-
-        btnDraw.addEventListener('click', () => {
-            isDrawingMode = !isDrawingMode;
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            if (isDrawingMode) {
-                videoPreview.pause();
-                canvas.classList.remove('pointer-events-none');
-                canvas.classList.add('cursor-crosshair');
-                btnDraw.classList.replace('bg-apple-card', 'bg-apple-accent');
-                btnDraw.querySelector('span').textContent = "Drawing...";
-            } else {
-                canvas.classList.add('pointer-events-none');
-                canvas.classList.remove('cursor-crosshair');
-                btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
-                btnDraw.querySelector('span').textContent = "Brush";
-            }
-        });
-        btnClear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
-
-        canvas.addEventListener('mousedown', (e) => { if(!isDrawingMode)return; isDrawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
-        canvas.addEventListener('mousemove', (e) => { if(!isDrawing)return; ctx.lineWidth=4; ctx.strokeStyle='#ff3b30'; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
-        canvas.addEventListener('mouseup', () => isDrawing=false);
-
-        // Speed controls
-        document.querySelectorAll('.speed-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                videoPreview.playbackRate = parseFloat(e.target.dataset.speed);
-                document.querySelectorAll('.speed-btn').forEach(b => b.classList.replace('bg-apple-accent', 'bg-apple-card'));
-                e.target.classList.replace('bg-apple-card', 'bg-apple-accent');
-            });
-        });
-
-        // Knowledge base for AI tactical evaluation
-        const tacticalScenarios = [
-            {
-                situation: "Penalty Corner (Drag-Flick Defense)",
-                decisionScore: 9,
-                decisionDesc: "Excelente lectura de la orientación de los hombros del tirador. Salida en el timing exacto de inyección sin comprometer anticipadamente la postura.",
-                execScore: 8,
-                execDesc: "Buena flexión de rodillas y superficie de bloqueo firme. El guante derecho bajó 3cm tarde en el último tramo del deslizamiento.",
-                reaction: "0.19s",
-                distance: "3.2m",
-                strategy: "Para maximizar el éxito en esta jugada, el portero debe mantener el stick plano apoyado en el césped durante el primer metro de arrastre, orientando el ángulo de rechazo hacia la banda lateral exterior (fuera de la zona de peligro de 10 metros)."
-            },
-            {
-                situation: "1v1 Open Play (Cierre de ángulo)",
-                decisionScore: 8,
-                decisionDesc: "Correcta temporización del close-out, achicando el espacio de tiro en el momento en que el delantero pierde el control cercano de la bola.",
-                execScore: 9,
-                execDesc: "Postura de 'spread' impecable, maximizando cobertura de portería sin irse al suelo de forma prematura.",
-                reaction: "0.16s",
-                distance: "1.8m",
-                strategy: "La clave de éxito en este 1v1 reside en absorber el impacto sin generar rebote frontal. Obligar al atacante a perfilarse hacia su lado débil manteniendo el escudo del cuerpo cuadrado al vector del esférico."
-            },
-            {
-                situation: "Baseline Drive & Cut-Back (Defensa de Línea de Fondo)",
-                decisionScore: 7,
-                decisionDesc: "Posicionamiento en el poste correcto, aunque con leve retraso en la lectura del pase cruzado al segundo palo.",
-                execScore: 8,
-                execDesc: "Desplazamiento lateral fluido mediante técnica de shuffle, manteniendo el centro de gravedad bajo.",
-                reaction: "0.22s",
-                distance: "1.1m",
-                strategy: "Priorizar el bloqueo del pase raso interceptando con el canto del stick antes de que cruce el área pequeña. Mantener la visión periférica activa hacia los posibles rechaces en el punto de penalti."
-            }
-        ];
-
-        // AI Analysis Execution
-        btnAnalyze.addEventListener('click', async () => {
-            btnAnalyze.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analizando con IA...`;
-            btnAnalyze.disabled = true;
-
-            // Simulate AI processing delay for realism
-            setTimeout(() => {
-                const scenario = tacticalScenarios[Math.floor(Math.random() * tacticalScenarios.length)];
-
-                document.getElementById('dyn-situation').textContent = scenario.situation;
-                document.getElementById('score-decision').textContent = `${scenario.decisionScore} / 10`;
-                document.getElementById('desc-decision').textContent = scenario.decisionDesc;
-                
-                document.getElementById('score-execution').textContent = `${scenario.execScore} / 10`;
-                document.getElementById('desc-execution').textContent = scenario.execDesc;
-
-                document.getElementById('val-reaction').textContent = scenario.reaction;
-                document.getElementById('val-distance').textContent = scenario.distance;
-                document.getElementById('dyn-strategy').textContent = scenario.strategy;
-
-                // Save to Vault
-                const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
-                vault.push({
-                    date: new Date().toLocaleDateString(),
-                    filename: fileNameSpan.textContent,
-                    situation: scenario.situation,
-                    decision: scenario.decisionScore,
-                    execution: scenario.execScore,
-                    reaction: scenario.reaction
-                });
-                localStorage.setItem('goaliefy_vault', JSON.stringify(vault));
-                loadVault();
-
-                resultsSection.classList.remove('hidden');
-                btnAnalyze.innerHTML = `<span>Run AI Tactical & Kinematic Analysis</span>`;
-                btnAnalyze.disabled = false;
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 1200);
-        });
-
-        btnReset.addEventListener('click', () => {
-            videoPreview.src = "";
-            videoInput.value = "";
-            resultsSection.classList.add('hidden');
-            playerContainer.classList.add('hidden');
-            uploadPanel.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    </script>
-</body>
-</html>
+                    <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-50
