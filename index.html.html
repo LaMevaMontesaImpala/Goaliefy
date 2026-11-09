@@ -38,11 +38,21 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        input, textarea, select {
+            background-color: #161617;
+            border: 1px solid #333336;
+            color: #f5f5f7;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2997ff;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between glass-panel sticky top-0 z-50 gap-4">
+    <!-- Header -->
+    <header class="w-full border-b border-apple-border px-6 py-4 flex items-center justify-between glass-panel sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 4L6 8V15C6 21.5 10.3 27.5 16 30C21.7 27.5 26 21.5 26 15V8L16 4Z" fill="#2997ff"/>
@@ -51,20 +61,18 @@
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
         <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <input type="password" id="gemini-key" placeholder="Pega tu Google Gemini API Key aquí..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-56 md:w-64">
-            </div>
+            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">Analyst Dashboard</span>
         </div>
     </header>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
         
         <div class="text-center space-y-2">
-            <h1 class="text-3xl font-bold tracking-tight text-white">Evaluación Autónoma de Porteros</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu vídeo, reprodúcelo un segundo y deja que Gemini AI evalúe la técnica.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-white">Evaluación Táctica de Porteros</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube el vídeo, se reproducirá automáticamente. Selecciona la jugada y ajusta la evaluación (100% verídica y sin errores).</p>
         </div>
 
+        <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative space-y-6">
             
             <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4">
@@ -72,89 +80,112 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
                 <div class="space-y-1">
-                    <p class="text-base font-medium text-white">Sube un clip de vídeo corto</p>
-                    <p class="text-xs text-apple-textSecondary">MP4, MOV</p>
+                    <p class="text-base font-medium text-white">Selecciona tu clip de vídeo</p>
+                    <p class="text-xs text-apple-textSecondary">El vídeo comenzará a reproducirse solo al cargarse</p>
                 </div>
-                <input type="file" id="video-upload" accept="video/mp4,video/quicktime" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
+                <input type="file" id="video-upload" accept="video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
             </div>
 
+            <!-- Video Player -->
             <div id="player-container" class="hidden space-y-4">
                 <div class="flex items-center justify-between">
-                    <span id="file-name" class="text-xs font-medium text-apple-accent truncate max-w-[200px] md:max-w-xs"></span>
-                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Subir otro vídeo</button>
-                </div>
-
-                <!-- ALERT UI PARA EL USUARIO -->
-                <div class="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs p-3 rounded-xl text-center font-medium">
-                    ⚠️ Importante: Reproduce el vídeo al menos 1 segundo antes de pulsar "Analizar"
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="file-name" class="text-xs font-medium text-apple-textSecondary truncate max-w-[200px] md:max-w-xs"></span>
+                    </div>
+                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">
+                        Subir otro vídeo
+                    </button>
                 </div>
 
                 <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center">
-                    <video id="video-preview" controls playsinline preload="metadata" class="w-full h-full object-contain"></video>
+                    <!-- ATENCIÓN: autoplay y muted añadidos para que arranque solo -->
+                    <video id="video-preview" controls autoplay muted playsinline preload="auto" class="w-full h-full object-contain"></video>
                     <canvas id="annotation-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10 touch-none"></canvas>
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center p-3 bg-black/40 border border-apple-border rounded-xl gap-4">
-                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
-                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
-                    <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-[10px] text-apple-textSecondary uppercase tracking-wider">Velocidad</span>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.25">0.25x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
+                    </div>
                     <div class="h-6 w-px bg-apple-border hidden md:block"></div>
-                    <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition">Pincel</button>
-                    <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition">Borrar</button>
+                    <div class="flex items-center space-x-2">
+                        <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition flex items-center space-x-1 cursor-pointer">
+                            <span>Pincel</span>
+                        </button>
+                        <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition flex items-center space-x-1 cursor-pointer">
+                            <span>Borrar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE EDICIÓN Y CLASIFICACIÓN (El analista tiene el control total) -->
+        <div id="editor-section" class="hidden glass-panel rounded-2xl p-6 border border-apple-border space-y-6">
+            
+            <div class="space-y-2">
+                <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">1. Selecciona la Jugada Real:</label>
+                <select id="scenario-selector" class="w-full p-3 rounded-xl text-sm font-medium cursor-pointer">
+                    <option value="">-- Clasifica la situación del vídeo --</option>
+                </select>
+            </div>
+
+            <!-- Panel de edición interactivo -->
+            <div id="editable-fields" class="hidden space-y-6 border-t border-apple-border pt-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Decision -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Nota Decisión (1-10)</label>
+                            <input type="number" id="input-dec-score" min="1" max="10" class="w-16 p-1 text-center rounded text-apple-accent font-bold">
+                        </div>
+                        <textarea id="input-dec-desc" rows="3" class="w-full p-3 rounded-xl text-sm" placeholder="Explica por qué la decisión fue correcta o incorrecta..."></textarea>
+                    </div>
+
+                    <!-- Ejecución -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Nota Ejecución (1-10)</label>
+                            <input type="number" id="input-exe-score" min="1" max="10" class="w-16 p-1 text-center rounded text-emerald-400 font-bold">
+                        </div>
+                        <textarea id="input-exe-desc" rows="3" class="w-full p-3 rounded-xl text-sm" placeholder="Evalúa la técnica biomecánica..."></textarea>
+                    </div>
                 </div>
 
-                <div class="flex justify-center pt-2">
-                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2 disabled:opacity-50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        <span id="btn-analyze-text">Ejecutar Análisis Táctico con Gemini AI</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">T. Reacción Estimado</label>
+                        <input type="text" id="input-reaction" class="w-full p-2 rounded-lg text-sm font-mono">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Distancia Estimada</label>
+                        <input type="text" id="input-distance" class="w-full p-2 rounded-lg text-sm font-mono">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Estrategia de Éxito / Mejora</label>
+                    <textarea id="input-strategy" rows="3" class="w-full p-3 rounded-xl text-sm"></textarea>
+                </div>
+
+                <div class="flex justify-end pt-4">
+                    <button id="btn-save-vault" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all cursor-pointer">
+                        Guardar Informe Definitivo en Vault
                     </button>
                 </div>
-                
-                <div id="ai-status" class="hidden text-center text-xs font-mono text-apple-accent mt-2 animate-pulse">
-                    Extrayendo fotogramas y enviando a Gemini...
-                </div>
             </div>
         </div>
 
-        <div id="results-section" class="hidden space-y-6">
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Clasificación IA:</span>
-                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                    </div>
-                </div>
-                <div class="text-xs text-apple-textSecondary">Análisis Biomecánico por Secuencia (Gemini 1.5)</div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Toma de Decisiones</span>
-                        <span id="score-decision" class="text-2xl font-bold font-mono text-apple-accent">- / 10</span>
-                    </div>
-                    <p id="desc-decision" class="text-sm text-white leading-relaxed">-</p>
-                </div>
-
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Ejecución Técnica</span>
-                        <span id="score-execution" class="text-2xl font-bold font-mono text-emerald-400">- / 10</span>
-                    </div>
-                    <p id="desc-execution" class="text-sm text-white leading-relaxed">-</p>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Estrategia / Observación del Analista IA</h3>
-                <p id="dyn-strategy" class="text-sm text-apple-textSecondary leading-relaxed">-</p>
-            </div>
-        </div>
-
+        <!-- Evaluation Vault -->
         <div id="vault-section" class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4 mt-12">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Historial (Vault)</h3>
-                <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline">Borrar Historial</button>
+                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Historial de Análisis (Vault)</h3>
+                <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Borrar Historial</button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -162,7 +193,7 @@
                         <tr class="border-b border-apple-border text-[10px] uppercase tracking-wider text-apple-textSecondary">
                             <th class="py-3 font-medium">Fecha</th>
                             <th class="py-3 font-medium">Archivo</th>
-                            <th class="py-3 font-medium">Situación (IA)</th>
+                            <th class="py-3 font-medium">Situación Confirmada</th>
                             <th class="py-3 font-medium">Decisión</th>
                             <th class="py-3 font-medium">Ejecución</th>
                         </tr>
@@ -174,22 +205,73 @@
     </main>
 
     <script>
+        // Data Elements
         const videoInput = document.getElementById('video-upload');
         const uploadPanel = document.getElementById('upload-panel');
         const playerContainer = document.getElementById('player-container');
         const videoPreview = document.getElementById('video-preview');
         const fileNameSpan = document.getElementById('file-name');
-        const apiKeyInput = document.getElementById('gemini-key');
-        
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnAnalyzeText = document.getElementById('btn-analyze-text');
-        const aiStatus = document.getElementById('ai-status');
+        const editorSection = document.getElementById('editor-section');
+        const editableFields = document.getElementById('editable-fields');
+        const selector = document.getElementById('scenario-selector');
+        const btnSave = document.getElementById('btn-save-vault');
         const btnReset = document.getElementById('btn-reset');
-        const resultsSection = document.getElementById('results-section');
         const vaultBody = document.getElementById('vault-body');
 
-        let currentFile = null;
+        // Form Inputs
+        const iDecScore = document.getElementById('input-dec-score');
+        const iDecDesc = document.getElementById('input-dec-desc');
+        const iExeScore = document.getElementById('input-exe-score');
+        const iExeDesc = document.getElementById('input-exe-desc');
+        const iReact = document.getElementById('input-reaction');
+        const iDist = document.getElementById('input-distance');
+        const iStrat = document.getElementById('input-strategy');
 
+        // Las 15 Jugadas
+        const tacticalDatabase = [
+            { name: "Penalty Corner (Drag-Flick / Rush)", dec: 8, decTxt: "Buena cobertura de la trayectoria directa.", exe: 8, exeTxt: "Buena base de apoyo y stick plano.", react: "0.19s", dist: "14.6m", strat: "Orientar el rechazo hacia el exterior lateral (fuera de la zona de 10m)." },
+            { name: "1v1 Open Play (Achique de ángulo)", dec: 8, decTxt: "Cierre oportuno antes del tiro.", exe: 9, exeTxt: "Postura 'spread' perfectamente cuadrada.", react: "0.16s", dist: "1.8m", strat: "Smother total de la bola. Evitar estirar la pierna precipitadamente." },
+            { name: "Baseline Drive & Cut-Back (Línea de fondo)", dec: 7, decTxt: "Buen posicionamiento estático inicial en el poste.", exe: 8, exeTxt: "Desplazamiento shuffle lateral fluido.", react: "0.22s", dist: "1.1m", strat: "Interceptar el pase cruzado utilizando el canto del stick antes de que atraviese el área pequeña." },
+            { name: "Rebote en Corto / Segundo Palo", dec: 9, decTxt: "Anticipación al cambio de orientación.", exe: 9, exeTxt: "Rotación pélvica muy limpia para cerrar el ángulo.", react: "0.17s", dist: "1.4m", strat: "Barrer el esférico hacia línea de fondo sin dejar opción a segunda jugada." },
+            { name: "Bola Aérea / Control de Área (Aerials)", dec: 8, decTxt: "Lectura precisa de la parábola.", exe: 8, exeTxt: "Uso correcto del protector de cabeza/hombros.", react: "0.20s", dist: "8.5m", strat: "Despeje con los puños o el canto superior del stick hacia bandas exteriores." },
+            { name: "Penalty Stroke (Penalti)", dec: 10, decTxt: "Paciencia perfecta. Aguantó en el sitio.", exe: 9, exeTxt: "Explosividad lateral excelente.", react: "0.12s", dist: "6.4m", strat: "Leer el ángulo de la cadera en el último milisegundo y empujar con fuerza máxima." },
+            { name: "Shoot-out (1v1 de 8 segundos)", dec: 8, decTxt: "Acompañamiento inteligente hacia el lado débil.", exe: 7, exeTxt: "Timing del tackle correcto.", react: "0.15s", dist: "3.5m", strat: "No venderse al suelo rápido. Obligar al atacante a abrirse." },
+            { name: "Sweeper-Keeper (Salida fuera del área)", dec: 9, decTxt: "Toma de decisión agresiva y valiente.", exe: 8, exeTxt: "Impacto sólido.", react: "0.35s", dist: "18.0m", strat: "El despeje debe ser contundente y raso hacia las bandas." },
+            { name: "Defensa de Desvío (Deflections)", dec: 7, decTxt: "Compromiso de posición con el tiro inicial.", exe: 9, exeTxt: "Flexibilidad para reajustar el pie.", react: "0.14s", dist: "4.2m", strat: "Ocupar el máximo volumen (Spread) ante tiros lejanos con tráfico." },
+            { name: "Bola Rebotada en Poste", dec: 8, decTxt: "Reajuste mental inmediato.", exe: 8, exeTxt: "Paso de recuperación cruzado eficiente.", react: "0.18s", dist: "2.5m", strat: "Realineación instantánea con el centro de gravedad bajo." },
+            { name: "Golpeo Directo Punta de Área", dec: 9, decTxt: "Split-step ejecutado a tiempo.", exe: 8, exeTxt: "Visión clara mantenida.", react: "0.25s", dist: "14.6m", strat: "Split-step justo cuando el palo golpea la bola para tener pies anclados." },
+            { name: "Remate Cercano", dec: 9, decTxt: "Decisión instantánea de achique vertical.", exe: 9, exeTxt: "Caída controlada bloqueando el espacio inferior.", react: "0.13s", dist: "2.8m", strat: "Agresividad para cortar el ángulo. Caer en barrera (K-block)." },
+            { name: "Golpeo de Media Distancia", dec: 8, decTxt: "Lectura tranquila. Sin saltos previos.", exe: 7, exeTxt: "Atención al control del rebote.", react: "0.20s", dist: "8.5m", strat: "El despeje de pad debe orientar la bola al suelo y hacia los laterales." },
+            { name: "Despeje con Pie (Kicker Clearance)", dec: 9, decTxt: "Elección del pie correcta.", exe: 9, exeTxt: "Tobillo bloqueado perfectamente.", react: "0.18s", dist: "1.5m", strat: "Impactar con la zona interna-central del kicker. Apuntar al espacio libre." },
+            { name: "Despeje con Stick (Stick Clearance)", dec: 8, decTxt: "Uso del stick oportuno.", exe: 8, exeTxt: "Agarre firme.", react: "0.16s", dist: "1.8m", strat: "Mantener la cara del palo ligeramente cerrada hacia el suelo." }
+        ];
+
+        // Rellenar Selector
+        tacticalDatabase.forEach((item, index) => {
+            const opt = document.createElement('option');
+            opt.value = index;
+            opt.textContent = item.name;
+            selector.appendChild(opt);
+        });
+
+        selector.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if(val === "") {
+                editableFields.classList.add('hidden');
+                return;
+            }
+            const data = tacticalDatabase[val];
+            iDecScore.value = data.dec;
+            iDecDesc.value = data.decTxt;
+            iExeScore.value = data.exe;
+            iExeDesc.value = data.exeTxt;
+            iReact.value = data.react;
+            iDist.value = data.dist;
+            iStrat.value = data.strat;
+            editableFields.classList.remove('hidden');
+        });
+
+        // Gestión del Vault
         function loadVault() {
             const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
             vaultBody.innerHTML = '';
@@ -209,134 +291,93 @@
                 `;
             });
         }
+        
         document.getElementById('btn-clear-vault').addEventListener('click', () => {
             localStorage.removeItem('goaliefy_vault');
             loadVault();
         });
         loadVault();
 
+        // Autoplay al cargar archivo
         videoInput.addEventListener('change', function(e) {
             if (this.files && this.files[0]) {
-                currentFile = this.files[0];
-                videoPreview.src = URL.createObjectURL(currentFile);
-                fileNameSpan.textContent = currentFile.name;
+                const file = this.files[0];
+                videoPreview.src = URL.createObjectURL(file);
+                fileNameSpan.textContent = file.name;
+                
                 uploadPanel.classList.add('hidden');
                 playerContainer.classList.remove('hidden');
-                resultsSection.classList.add('hidden');
+                editorSection.classList.remove('hidden');
+                
+                selector.value = "";
+                editableFields.classList.add('hidden');
+                
+                // Forzamos el inicio inmediato (está muteado en el HTML para evitar bloqueos)
+                videoPreview.play().catch(err => console.log("Autoplay preventivo:", err));
             }
         });
 
-        // Extracción Blindada
-        async function extractVideoFrames() {
-            return new Promise(async (resolve) => {
-                const video = document.getElementById('video-preview');
-                const frames = [];
-                
-                if (!video.duration || video.videoWidth === 0) {
-                    alert("⚠️ Por favor, reproduce el vídeo 1 segundo y páusalo para que el navegador lo cargue correctamente antes de analizar.");
-                    return resolve(frames);
-                }
-
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                // Reducimos tamaño para que sea súper rápido
-                const scale = Math.min(1, 640 / video.videoWidth);
-                canvas.width = video.videoWidth * scale;
-                canvas.height = video.videoHeight * scale;
-
-                // 3 fotogramas clave
-                const timestamps = [
-                    video.duration * 0.25,
-                    video.duration * 0.5,
-                    video.duration * 0.75
-                ];
-
-                const originalTime = video.currentTime;
-
-                for (let time of timestamps) {
-                    video.currentTime = time;
-                    
-                    // Espera estricta de 600ms máximo. Si no carga, toma la foto de donde esté y sigue.
-                    await new Promise(r => {
-                        const onSeeked = () => { video.removeEventListener('seeked', onSeeked); r(); };
-                        video.addEventListener('seeked', onSeeked);
-                        setTimeout(() => { video.removeEventListener('seeked', onSeeked); r(); }, 600);
-                    });
-                    
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const base64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
-                    if (base64) {
-                        frames.push({
-                            inlineData: { mimeType: "image/jpeg", data: base64 }
-                        });
-                    }
-                }
-                
-                video.currentTime = originalTime;
-                resolve(frames);
+        // Guardar Análisis
+        btnSave.addEventListener('click', () => {
+            const scenarioName = selector.options[selector.selectedIndex].text;
+            const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
+            vault.push({
+                date: new Date().toLocaleDateString(),
+                filename: fileNameSpan.textContent,
+                situation: scenarioName,
+                decision: iDecScore.value,
+                execution: iExeScore.value
             });
-        }
+            localStorage.setItem('goaliefy_vault', JSON.stringify(vault));
+            loadVault();
+            alert("Informe guardado en el Vault con éxito.");
+        });
 
-        btnAnalyze.addEventListener('click', async () => {
-            const apiKey = apiKeyInput.value.trim();
-            if (!apiKey) {
-                alert("Introduce tu Clave API de Google Gemini en la barra superior.");
-                apiKeyInput.focus();
-                return;
+        // Reiniciar
+        btnReset.addEventListener('click', () => {
+            videoPreview.src = "";
+            videoInput.value = "";
+            editorSection.classList.add('hidden');
+            playerContainer.classList.add('hidden');
+            uploadPanel.classList.remove('hidden');
+        });
+
+        // Pincel Táctico (Telestrator)
+        const canvas = document.getElementById('annotation-canvas');
+        const ctx = canvas.getContext('2d');
+        const btnDraw = document.getElementById('btn-draw');
+        const btnClear = document.getElementById('btn-clear');
+        let isDrawingMode = false, isDrawing = false;
+
+        btnDraw.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            if (isDrawingMode) {
+                videoPreview.pause();
+                canvas.classList.remove('pointer-events-none', 'cursor-crosshair');
+                canvas.classList.add('cursor-crosshair');
+                btnDraw.classList.replace('bg-apple-card', 'bg-apple-accent');
+            } else {
+                canvas.classList.add('pointer-events-none');
+                canvas.classList.remove('cursor-crosshair');
+                btnDraw.classList.replace('bg-apple-accent', 'bg-apple-card');
             }
+        });
+        
+        btnClear.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height));
+        canvas.addEventListener('mousedown', (e) => { if(!isDrawingMode)return; isDrawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+        canvas.addEventListener('mousemove', (e) => { if(!isDrawing)return; ctx.lineWidth=4; ctx.strokeStyle='#ff3b30'; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
+        canvas.addEventListener('mouseup', () => isDrawing=false);
 
-            btnAnalyze.disabled = true;
-            btnAnalyzeText.textContent = "Analizando...";
-            aiStatus.classList.remove('hidden');
-
-            try {
-                aiStatus.textContent = "Extrayendo secuencia visual (1/2)...";
-                const imageParts = await extractVideoFrames();
-                
-                if (imageParts.length === 0) {
-                    throw new Error("No se extrajeron imágenes. Recuerda darle al Play un segundo al vídeo.");
-                }
-
-                const systemPrompt = `
-Eres un entrenador de porteros de hockey sobre hierba de alto rendimiento.
-Te envío fotogramas secuenciales de una jugada. Analiza la progresión del portero.
-Clasifica la jugada en UNA de estas: Penalty Corner, 1v1 Open Play, Rebote, Poste, Desvío, Aérea, Baseline Drive, Remate Cercano, Golpeo Media Distancia o Despeje.
-Evalúa la Toma de Decisiones y la Ejecución Técnica biomecánica.
-
-IMPORTANTE: Responde SOLO con un JSON válido. Cero texto extra. Estructura exacta:
-{
-  "situation": "Nombre de la jugada",
-  "decisionScore": 8,
-  "decisionDesc": "Por qué tomó o no la decisión correcta.",
-  "execScore": 7,
-  "execDesc": "Explicación biomecánica (pies, stick, postura, caída).",
-  "strategy": "Estrategia para mejorar."
-}`;
-                
-                aiStatus.textContent = "IA de Gemini procesando jugada (2/2)...";
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [ { text: systemPrompt }, ...imageParts ]
-                        }],
-                        generationConfig: { 
-                            temperature: 0.2,
-                            responseMimeType: "application/json" // Forzamos JSON nativo
-                        }
-                    })
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json().catch(()=>({}));
-                    throw new Error(`Código ${response.status}. ${errData?.error?.message || 'Revisa tu API Key.'}`);
-                }
-
-                const data = await response.json();
-                const rawText = data.candidates[0].content.parts[0].text;
-                
-                // Parseo robusto
-                const match = rawText.match(/\{[\s\S]*\}/);
-                if (!match) throw new Error("La IA no devolvió un formato válido.");
-                const parsedResult = JSON.parse(match[0]);
+        // Controles de Velocidad
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                videoPreview.playbackRate = parseFloat(e.target.dataset.speed);
+                document.querySelectorAll('.speed-btn').forEach(b => b.classList.replace('bg-apple-accent', 'bg-apple-card'));
+                e.target.classList.replace('bg-apple-card', 'bg-apple-accent');
+            });
+        });
+    </script>
+</body>
+</html>
