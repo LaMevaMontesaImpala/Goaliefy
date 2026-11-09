@@ -42,7 +42,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    <!-- Header -->
+    <!-- Header con API Key -->
     <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between glass-panel sticky top-0 z-50 gap-4">
         <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +63,7 @@
         
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-bold tracking-tight text-white">Análisis Autónomo por IA</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip táctico de hockey hierba, introduce tu clave de Google AI Studio y deja que la IA clasifique y puntúe la jugada automáticamente.</p>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip táctico, introduce tu clave de Google AI Studio y deja que la IA clasifique y puntúe la jugada de forma automática.</p>
         </div>
 
         <!-- Upload & Player Section -->
@@ -75,7 +75,7 @@
                 </svg>
                 <div class="space-y-1">
                     <p class="text-base font-medium text-white">Sube un clip de vídeo corto</p>
-                    <p class="text-xs text-apple-textSecondary">Formatos MP4, MOV recomendados</p>
+                    <p class="text-xs text-apple-textSecondary">Formatos MP4 / MOV estándar (H.264)</p>
                 </div>
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
             </div>
@@ -97,8 +97,8 @@
                     <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition" data-speed="0.5">0.5x</button>
                     <button class="speed-btn px-2 py-1 text-xs rounded bg-apple-accent text-white hover:bg-blue-600 transition" data-speed="1">1.0x</button>
                     <div class="h-6 w-px bg-apple-border hidden md:block"></div>
-                    <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition cursor-pointer">Pincel</button>
-                    <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition cursor-pointer">Borrar</button>
+                    <button id="btn-draw" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-apple-border transition">Pincel</button>
+                    <button id="btn-clear" class="px-3 py-1 text-xs rounded bg-apple-card text-white hover:bg-red-500/20 hover:text-red-400 transition">Borrar</button>
                 </div>
 
                 <!-- Botón de Análisis Automatizado por IA -->
@@ -164,69 +164,4 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-apple-border text-[10px] uppercase tracking-wider text-apple-textSecondary">
-                            <th class="py-3 font-medium">Fecha</th>
-                            <th class="py-3 font-medium">Archivo</th>
-                            <th class="py-3 font-medium">Situación (IA)</th>
-                            <th class="py-3 font-medium">Decisión</th>
-                            <th class="py-3 font-medium">Ejecución</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vault-body" class="text-xs text-white"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        const videoInput = document.getElementById('video-upload');
-        const uploadPanel = document.getElementById('upload-panel');
-        const playerContainer = document.getElementById('player-container');
-        const videoPreview = document.getElementById('video-preview');
-        const fileNameSpan = document.getElementById('file-name');
-        const apiKeyInput = document.getElementById('gemini-key');
-        
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnAnalyzeText = document.getElementById('btn-analyze-text');
-        const aiStatus = document.getElementById('ai-status');
-        const btnReset = document.getElementById('btn-reset');
-        const resultsSection = document.getElementById('results-section');
-        const vaultBody = document.getElementById('vault-body');
-
-        let currentFile = null;
-
-        function loadVault() {
-            const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
-            vaultBody.innerHTML = '';
-            if (vault.length === 0) {
-                vaultBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-apple-textSecondary">Sin registros.</td></tr>`;
-                return;
-            }
-            vault.reverse().forEach(item => {
-                vaultBody.innerHTML += `
-                    <tr class="border-b border-apple-border/50">
-                        <td class="py-3 text-apple-textSecondary">${item.date}</td>
-                        <td class="py-3 font-medium truncate max-w-[120px]">${item.filename}</td>
-                        <td class="py-3"><span class="px-2 py-1 rounded bg-apple-border text-[10px]">${item.situation}</span></td>
-                        <td class="py-3 font-mono font-bold text-apple-accent">${item.decision}/10</td>
-                        <td class="py-3 font-mono font-bold text-emerald-400">${item.execution}/10</td>
-                    </tr>
-                `;
-            });
-        }
-        document.getElementById('btn-clear-vault').addEventListener('click', () => {
-            localStorage.removeItem('goaliefy_vault');
-            loadVault();
-        });
-        loadVault();
-
-        // Manejo blindado de subida de vídeo con recarga de búfer para evitar pantalla en negro
-        videoInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                currentFile = this.files[0];
-                videoPreview.src = URL.createObjectURL(currentFile);
-                videoPreview.load();
-                fileNameSpan.textContent = currentFile.name;
-                uploadPanel.classList.add('hidden');
-                playerContainer.classList.remove('hidden');
-                resultsSection
+                        <tr class="border-b border
