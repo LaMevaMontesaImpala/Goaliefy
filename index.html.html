@@ -42,6 +42,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
+    <!-- Header -->
     <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between glass-panel sticky top-0 z-50 gap-4">
         <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,201 +52,123 @@
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
         <div class="flex items-center space-x-4">
-            <nav class="flex space-x-1 bg-black/40 p-1 rounded-lg border border-apple-border text-xs">
-                <button id="tab-analyzer" class="px-3 py-1.5 rounded-md bg-apple-accent text-white font-medium transition cursor-pointer">Analizador IA</button>
-                <button id="tab-kit" class="px-3 py-1.5 rounded-md text-apple-textSecondary hover:text-white transition cursor-pointer">Kit de Portero</button>
-            </nav>
             <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-36 md:w-48">
+                <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-48 md:w-64">
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
         
-        <!-- SECCIÓN 1: ANALIZADOR TÁCTICO -->
-        <div id="view-analyzer" class="space-y-8">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-bold tracking-tight text-white">CD Terrassa | Análisis Táctico por IA</h1>
-                <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube una captura o fotograma de la jugada (JPG/PNG) o tu vídeo. La IA evaluará tu técnica al instante.</p>
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight text-white">CD Terrassa | Análisis de Vídeo por IA</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip de vídeo, reprodúcelo hasta el momento clave de la parada y pulsa analizar para obtener el diagnóstico de Gemini.</p>
+        </div>
+
+        <!-- Upload & Player Section -->
+        <div class="glass-panel rounded-2xl p-6 border border-apple-border relative space-y-6">
+            
+            <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4">
+                <svg class="w-12 h-12 text-apple-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <div class="space-y-1">
+                    <p class="text-base font-medium text-white">Sube tu clip de vídeo</p>
+                    <p class="text-xs text-apple-textSecondary">Formatos MP4 / MOV</p>
+                </div>
+                <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
             </div>
 
-            <div class="glass-panel rounded-2xl p-6 border border-apple-border relative space-y-6">
-                <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4">
-                    <svg class="w-12 h-12 text-apple-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <div class="space-y-1">
-                        <p class="text-base font-medium text-white">Sube imagen o fotograma de la jugada</p>
-                        <p class="text-xs text-apple-textSecondary">PNG, JPG (Garantiza 100% compatibilidad sin pantallas en negro)</p>
-                    </div>
-                    <input type="file" id="image-upload" accept="image/png,image/jpeg,image/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
+            <!-- Video Player -->
+            <div id="player-container" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <span id="file-name" class="text-xs font-medium text-apple-accent truncate max-w-[200px] md:max-w-xs"></span>
+                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Subir otro vídeo</button>
                 </div>
 
-                <div id="player-container" class="hidden space-y-4">
+                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center">
+                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                </div>
+
+                <div class="flex justify-center pt-2">
+                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2 disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span id="btn-analyze-text">Analizar Fotograma Actual con Gemini AI</span>
+                    </button>
+                </div>
+                
+                <div id="ai-status" class="hidden text-center text-xs font-mono text-apple-accent mt-2 animate-pulse">
+                    Procesando y enviando fotograma a Gemini...
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard de Resultados -->
+        <div id="results-section" class="hidden space-y-6">
+            
+            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Jugada Detectada:</span>
+                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
+                    </div>
+                </div>
+                <div class="text-xs text-apple-textSecondary">Gemini 1.5 Flash</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
                     <div class="flex items-center justify-between">
-                        <span id="file-name" class="text-xs font-medium text-apple-accent truncate max-w-[200px] md:max-w-xs"></span>
-                        <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Subir otra imagen</button>
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Toma de Decisiones</span>
+                        <span id="score-decision" class="text-2xl font-bold font-mono text-apple-accent">- / 10</span>
                     </div>
-
-                    <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex items-center justify-center">
-                        <img id="image-preview" class="w-full h-full object-contain" alt="Vista previa de la jugada">
-                    </div>
-
-                    <div class="flex justify-center pt-2">
-                        <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2 disabled:opacity-50">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span id="btn-analyze-text">Analizar Jugada con Gemini AI</span>
-                        </button>
-                    </div>
-                    
-                    <div id="ai-status" class="hidden text-center text-xs font-mono text-apple-accent mt-2 animate-pulse">
-                        Evaluando biomecánica y toma de decisiones...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resultados -->
-            <div id="results-section" class="hidden space-y-6">
-                <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Jugada Detectada:</span>
-                            <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                        </div>
-                    </div>
-                    <div class="text-xs text-apple-textSecondary">Gemini 1.5 Flash</div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Toma de Decisiones</span>
-                            <span id="score-decision" class="text-2xl font-bold font-mono text-apple-accent">- / 10</span>
-                        </div>
-                        <p id="desc-decision" class="text-sm text-white leading-relaxed">-</p>
-                    </div>
-
-                    <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Ejecución Técnica</span>
-                            <span id="score-execution" class="text-2xl font-bold font-mono text-emerald-400">- / 10</span>
-                        </div>
-                        <p id="desc-execution" class="text-sm text-white leading-relaxed">-</p>
-                    </div>
+                    <p id="desc-decision" class="text-sm text-white leading-relaxed">-</p>
                 </div>
 
                 <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Estrategia y Observación Táctica</h3>
-                    <p id="dyn-strategy" class="text-sm text-apple-textSecondary leading-relaxed">-</p>
-                </div>
-            </div>
-
-            <!-- Vault Historial -->
-            <div id="vault-section" class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4 mt-12">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Historial de Análisis (Vault)</h3>
-                    <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Borrar Historial</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-apple-border text-[10px] uppercase tracking-wider text-apple-textSecondary">
-                                <th class="py-3 font-medium">Fecha</th>
-                                <th class="py-3 font-medium">Archivo</th>
-                                <th class="py-3 font-medium">Situación (IA)</th>
-                                <th class="py-3 font-medium">Decisión</th>
-                                <th class="py-3 font-medium">Ejecución</th>
-                            </tr>
-                        </thead>
-                        <tbody id="vault-body" class="text-xs text-white"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECCIÓN 2: DISEÑO DE KIT DE PORTERO (CD Terrassa) -->
-        <div id="view-kit" class="hidden space-y-8">
-            <div class="text-center space-y-2">
-                <h1 class="text-3xl font-bold tracking-tight text-white">CD Terrassa | Equipación Oficial de Portero</h1>
-                <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Diseño exclusivo de la camiseta negra de portero integrando la cruz gráfica oficial en blanco en armonía con la segunda equipación del club.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div class="glass-panel rounded-2xl p-8 border border-apple-border flex flex-col items-center justify-center space-y-6 relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none"></div>
-                    
-                    <div class="w-56 h-64 bg-[#111113] rounded-2xl border border-apple-border p-6 flex flex-col items-center justify-between shadow-2xl relative">
-                        <div class="w-16 h-4 bg-black rounded-b-lg border-b border-apple-border"></div>
-                        
-                        <div class="absolute inset-0 flex items-center justify-center opacity-90">
-                            <div class="relative w-28 h-28 flex items-center justify-center">
-                                <div class="absolute w-8 h-28 bg-white rounded-md shadow-lg"></div>
-                                <div class="absolute w-28 h-8 bg-white rounded-md shadow-lg"></div>
-                            </div>
-                        </div>
-
-                        <div class="w-full flex justify-between items-center z-10 text-[10px] font-mono text-apple-textSecondary">
-                            <span class="font-bold text-white tracking-widest">CD TERRASSA</span>
-                            <span>GOALIE</span>
-                        </div>
-                        <div class="z-10 text-3xl font-black font-mono text-white tracking-tighter">1</div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Ejecución Técnica</span>
+                        <span id="score-execution" class="text-2xl font-bold font-mono text-emerald-400">- / 10</span>
                     </div>
-                    <span class="text-xs font-mono text-apple-accent">Modelo Principal: Negro / Cruz Blanca</span>
+                    <p id="desc-execution" class="text-sm text-white leading-relaxed">-</p>
                 </div>
+            </div>
 
-                <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-6">
-                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Especificaciones del Kit</h3>
-                    
-                    <ul class="space-y-4 text-xs text-apple-textSecondary">
-                        <li class="flex items-start space-x-3">
-                            <span class="w-1.5 h-1.5 rounded-full bg-apple-accent mt-1.5 shrink-0"></span>
-                            <div><strong class="text-white">Base Cromática:</strong> Negro total de alta densidad, diseñado para maximizar el contraste visual y la presencia en el área de 23 metros.</div>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="w-1.5 h-1.5 rounded-full bg-apple-accent mt-1.5 shrink-0"></span>
-                            <div><strong class="text-white">Patrón Gráfico Central:</strong> Cruz icónica en blanco puro, respetando la identidad corporativa y encajando perfectamente con la segunda equipación blanca del CD Terrassa.</div>
-                        </li>
-                        <li class="flex items-start space-x-3">
-                            <span class="w-1.5 h-1.5 rounded-full bg-apple-accent mt-1.5 shrink-0"></span>
-                            <div><strong class="text-white">Textil Técnico:</strong> Tejido ultratranspirable de secado rápido con refuerzos ergonómicos en codos y antebrazos para soportar los arrastres en hierba artificial.</div>
-                        </li>
-                    </ul>
-                </div>
+            <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Estrategia y Observación Táctica</h3>
+                <p id="dyn-strategy" class="text-sm text-apple-textSecondary leading-relaxed">-</p>
             </div>
         </div>
 
+        <!-- Vault -->
+        <div id="vault-section" class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4 mt-12">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Historial de Análisis (Vault)</h3>
+                <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Borrar Historial</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-apple-border text-[10px] uppercase tracking-wider text-apple-textSecondary">
+                            <th class="py-3 font-medium">Fecha</th>
+                            <th class="py-3 font-medium">Archivo</th>
+                            <th class="py-3 font-medium">Situación (IA)</th>
+                            <th class="py-3 font-medium">Decisión</th>
+                            <th class="py-3 font-medium">Ejecución</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vault-body" class="text-xs text-white"></tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <script>
-        const tabAnalyzer = document.getElementById('tab-analyzer');
-        const tabKit = document.getElementById('tab-kit');
-        const viewAnalyzer = document.getElementById('view-analyzer');
-        const viewKit = document.getElementById('view-kit');
-
-        tabAnalyzer.addEventListener('click', () => {
-            viewAnalyzer.classList.remove('hidden');
-            viewKit.classList.add('hidden');
-            tabAnalyzer.classList.add('bg-apple-accent', 'text-white');
-            tabAnalyzer.classList.remove('text-apple-textSecondary');
-            tabKit.classList.remove('bg-apple-accent', 'text-white');
-            tabKit.classList.add('text-apple-textSecondary');
-        });
-
-        tabKit.addEventListener('click', () => {
-            viewKit.classList.remove('hidden');
-            viewAnalyzer.classList.add('hidden');
-            tabKit.classList.add('bg-apple-accent', 'text-white');
-            tabKit.classList.remove('text-apple-textSecondary');
-            tabAnalyzer.classList.remove('bg-apple-accent', 'text-white');
-            tabAnalyzer.classList.add('text-apple-textSecondary');
-        });
-
-        const imageInput = document.getElementById('image-upload');
+        const videoInput = document.getElementById('video-upload');
         const uploadPanel = document.getElementById('upload-panel');
         const playerContainer = document.getElementById('player-container');
-        const imagePreview = document.getElementById('image-preview');
+        const videoPreview = document.getElementById('video-preview');
         const fileNameSpan = document.getElementById('file-name');
         const apiKeyInput = document.getElementById('gemini-key');
         
@@ -256,8 +179,7 @@
         const resultsSection = document.getElementById('results-section');
         const vaultBody = document.getElementById('vault-body');
 
-        let currentBase64 = null;
-        let currentFilename = "";
+        let currentFile = null;
 
         function loadVault() {
             const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
@@ -284,22 +206,23 @@
         });
         loadVault();
 
-        imageInput.addEventListener('change', function(e) {
+        // 🛡️ LECTOR BINARIO DE VÍDEO BLINDADO (Garantiza carga y reproducción sin pantallas negras)
+        videoInput.addEventListener('change', function(e) {
             if (this.files && this.files[0]) {
-                const file = this.files[0];
-                currentFilename = file.name;
-                fileNameSpan.textContent = currentFilename;
+                currentFile = this.files[0];
+                fileNameSpan.textContent = currentFile.name;
 
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    currentBase64 = event.target.result.split(',')[1];
-                    imagePreview.src = event.target.result;
+                    const blob = new Blob([event.target.result], { type: currentFile.type || 'video/mp4' });
+                    videoPreview.src = URL.createObjectURL(blob);
+                    videoPreview.load();
 
                     uploadPanel.classList.add('hidden');
                     playerContainer.classList.remove('hidden');
                     resultsSection.classList.add('hidden');
                 };
-                reader.readAsDataURL(file);
+                reader.readAsArrayBuffer(currentFile);
             }
         });
 
@@ -311,18 +234,25 @@
                 return;
             }
 
-            if (!currentBase64) {
-                alert("Sube una imagen o fotograma primero.");
+            if (!videoPreview.videoWidth) {
+                alert("Espera un instante a que el vídeo termine de cargar en el reproductor.");
                 return;
             }
 
             btnAnalyze.disabled = true;
-            btnAnalyzeText.textContent = "Analizando con Gemini...";
+            btnAnalyzeText.textContent = "Analizando fotograma...";
             aiStatus.classList.remove('hidden');
 
             try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = (videoPreview.videoHeight / videoPreview.videoWidth) * 640;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+                const base64Data = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
                 const imagePart = {
-                    inlineData: { mimeType: "image/jpeg", data: currentBase64 }
+                    inlineData: { mimeType: "image/jpeg", data: base64Data }
                 };
 
                 const systemPrompt = `
@@ -393,7 +323,7 @@ IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido, sin Markdown (\`\`\
                 const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
                 vault.push({
                     date: new Date().toLocaleDateString(),
-                    filename: currentFilename,
+                    filename: fileNameSpan.textContent,
                     situation: parsedResult.situation || "Desconocida",
                     decision: parsedResult.decisionScore || 0,
                     execution: parsedResult.execScore || 0
@@ -406,23 +336,4 @@ IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido, sin Markdown (\`\`\
 
             } catch (error) {
                 console.error(error);
-                alert("Error en el análisis automático: " + error.message);
-            } finally {
-                btnAnalyze.disabled = false;
-                btnAnalyzeText.textContent = "Analizar Jugada con Gemini AI";
-                aiStatus.classList.add('hidden');
-            }
-        });
-
-        btnReset.addEventListener('click', () => {
-            imagePreview.src = "";
-            imageInput.value = "";
-            currentBase64 = null;
-            resultsSection.classList.add('hidden');
-            playerContainer.classList.add('hidden');
-            uploadPanel.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    </script>
-</body>
-</html>
+                alert
