@@ -63,7 +63,7 @@
         
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-bold tracking-tight text-white">Análisis Autónomo por IA</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip táctico, introduce tu clave de Google AI Studio y deja que la IA clasifique y puntúe la jugada de forma automática.</p>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip táctico, introduce tu clave de Google AI Studio y deja que la IA clasifique y puntúe la jugada automáticamente.</p>
         </div>
 
         <!-- Upload & Player Section -->
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center">
-                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                    <video id="video-preview" controls playsinline muted preload="auto" class="w-full h-full object-contain"></video>
                     <canvas id="annotation-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-10 touch-none"></canvas>
                 </div>
 
@@ -118,50 +118,4 @@
         <!-- Dashboard de Resultados Automatizados -->
         <div id="results-section" class="hidden space-y-6">
             
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Jugada Detectada por IA:</span>
-                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                    </div>
-                </div>
-                <div class="text-xs text-apple-textSecondary">Gemini 1.5 Flash (Visión Automatizada)</div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Decision Making -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Toma de Decisiones</span>
-                        <span id="score-decision" class="text-2xl font-bold font-mono text-apple-accent">- / 10</span>
-                    </div>
-                    <p id="desc-decision" class="text-sm text-white leading-relaxed">-</p>
-                </div>
-
-                <!-- Execution -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Ejecución Técnica</span>
-                        <span id="score-execution" class="text-2xl font-bold font-mono text-emerald-400">- / 10</span>
-                    </div>
-                    <p id="desc-execution" class="text-sm text-white leading-relaxed">-</p>
-                </div>
-            </div>
-
-            <!-- Strategy -->
-            <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Estrategia y Observación Táctica</h3>
-                <p id="dyn-strategy" class="text-sm text-apple-textSecondary leading-relaxed">-</p>
-            </div>
-        </div>
-
-        <!-- Evaluation Vault -->
-        <div id="vault-section" class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4 mt-12">
-            <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Historial de Análisis (Vault)</h3>
-                <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Borrar Historial</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border
+            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4
