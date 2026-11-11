@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goaliefy | Análisis de Porteros por IA</title>
+    <title>Goaliefy | Pro Goalkeeper Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,7 +42,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    <!-- Header con Input para API Key -->
+    <!-- Header con API Key -->
     <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between glass-panel sticky top-0 z-50 gap-4">
         <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -66,60 +66,32 @@
             <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip, reprodúcelo hasta el fotograma clave de la jugada defensiva y pulsa analizar.</p>
         </div>
 
-        <!-- Sección de Subida y Reproductor -->
+        <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative space-y-6">
             
-            <!-- Panel Drag & Drop -->
-            <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4 transition-colors">
+            <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4">
                 <svg class="w-12 h-12 text-apple-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
                 <div class="space-y-1">
-                    <p class="text-base font-medium text-white">Sube o arrastra un clip de vídeo</p>
+                    <p class="text-base font-medium text-white">Sube un clip de vídeo</p>
                     <p class="text-xs text-apple-textSecondary">Formatos MP4 / MOV</p>
                 </div>
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
             </div>
 
-            <!-- Reproductor de Vídeo -->
+            <!-- Video Player -->
             <div id="player-container" class="hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <span id="file-name" class="text-xs font-medium text-apple-accent truncate max-w-[200px] md:max-w-xs"></span>
-                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Cambiar vídeo</button>
+                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Subir otro vídeo</button>
                 </div>
 
                 <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center">
                     <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
                 </div>
 
-                <!-- Botón de Análisis IA -->
+                <!-- Botón de Análisis -->
                 <div class="flex justify-center pt-2">
                     <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2 disabled:opacity-50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        <span id="btn-analyze-text">Analizar Momento Clave (IA)</span>
-                    </button>
-                </div>
-                
-                <div id="ai-status" class="hidden text-center text-xs font-mono text-apple-accent mt-2 animate-pulse">
-                    Procesando y enviando captura a Gemini...
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard de Resultados -->
-        <div id="results-section" class="hidden space-y-6">
-            
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Situación Detectada:</span>
-                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
-                    </div>
-                </div>
-                <div class="text-xs text-apple-textSecondary">Gemini 2.5 Flash</div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Métrica 1 -->
-                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
-                    <div class="flex items-center justify-
+                        <svg class="w-4 h-4" fill="none"
