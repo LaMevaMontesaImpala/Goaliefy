@@ -1,55 +1,73 @@
-// Archivo: api/analyze.js
-import { GoogleGenAI } from '@google/genai';
-
 export default async function handler(req, res) {
-    // Solo permitimos peticiones POST
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Método no permitido' });
+  // Solo aceptamos peticiones POST desde el frontend
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { imageBase64 } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Falta configurar GEMINI_API_KEY en las variables de entorno de Vercel.' });
+    }
+    if (!imageBase64) {
+      return res.status(400).json({ error: 'No se recibió el fotograma del vídeo.' });
     }
 
-    try {
-        const { imageBase64 } = req.body;
-        
-        if (!imageBase64) {
-            return res.status(400).json({ error: 'No se ha recibido el fotograma de la jugada.' });
-        }
-
-        // Inicializamos Gemini usando la variable de entorno de Vercel (totalmente oculta al usuario)
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-        const systemInstruction = `
-Eres un analista de rendimiento y entrenador de porteros de hockey sobre hierba de élite.
+    const systemPrompt = `
+Eres un analista de rendimiento y entrenador de porteros táctico de élite.
 Analiza este fotograma de una jugada defensiva.
-Clasifica la situación en UNA categoría táctica (ej: Penalty Corner, 1v1, Bola Aérea, etc).
-Evalúa del 1 al 10 la Toma de Decisiones y la Ejecución Técnica.
+Clasifica obligatoriamente la situación en UNA categoría táctica defensiva.
+Evalúa objetivamente del 1 al 10 la Toma de Decisiones y la Ejecución Técnica biomecánica visible.
 
-Responde ÚNICAMENTE con un JSON válido con esta estructura:
+Responde ÚNICAMENTE con un objeto JSON válido, sin bloques Markdown, con esta estructura:
 {
-  "situation": "Nombre de la jugada",
+  "situation": "Nombre de la situación",
   "decisionScore": 8,
   "decisionDesc": "Análisis táctico de la decisión.",
   "execScore": 7,
   "execDesc": "Análisis biomecánico (postura, stick, pies).",
-  "strategy": "Estrategia de mejora."
+  "strategy": "Estrategia recomendada."
 }`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: [
-                { text: systemInstruction },
-                { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
-            ],
-            config: {
-                responseMimeType: "application/json",
-                temperature: 0.2
-            }
-        });
+    // Llamada directa vía REST API (a prueba de fallos de dependencias Node)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    
+    const response = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: systemPrompt },
+            { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json"
+        }
+      })
+    });
 
-        // Devolvemos el JSON limpio al frontend
-        res.status(200).json(JSON.parse(response.text));
-
-    } catch (error) {
-        console.error("Error en Backend:", error);
-        res.status(500).json({ error: 'Error procesando la IA: ' + error.message });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Error API Gemini: ${errorData.error?.message || response.status}`);
     }
+
+    const data = await response.json();
+    const rawText = data.candidates[0].content.parts[0].text;
+    
+    // Limpieza de formato para garantizar JSON
+    const match = rawText.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("La IA no devolvió un formato JSON válido.");
+    
+    // Respuesta exitosa al frontend
+    res.status(200).json(JSON.parse(match[0]));
+
+  } catch (error) {
+    console.error("Error en Backend:", error);
+    res.status(500).json({ error: error.message });
+  }
 }
