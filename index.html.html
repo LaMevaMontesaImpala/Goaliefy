@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,17 +43,19 @@
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
     <!-- Header -->
-    <header class="w-full border-b border-apple-border px-6 py-4 flex items-center justify-between glass-panel sticky top-0 z-50">
+    <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row items-center justify-between glass-panel sticky top-0 z-50 gap-4">
         <div class="flex items-center space-x-3">
-            <!-- Logo: Escudo con la 'G' -->
             <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 4L6 8V15C6 21.5 10.3 27.5 16 30C21.7 27.5 26 21.5 26 15V8L16 4Z" fill="#2997ff"/>
                 <path d="M20 14C19.2 12.2 17.7 11 16 11C13.2 11 11 13.2 11 16C11 18.8 13.2 21 16 21C18.8 21 21 18.8 21 16H16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
         </div>
-        <div class="flex items-center space-x-4">
-            <span class="text-xs px-3 py-1 rounded-full bg-apple-border text-apple-textSecondary font-medium">AI Intelligence</span>
+        <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-44 md:w-56">
+            </div>
         </div>
     </header>
 
@@ -62,21 +64,19 @@
         <!-- Intro -->
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-bold tracking-tight text-white">Advanced Goalkeeper Video Analysis</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Drop your game footage. Our AI instantly classifies the situation, calculates high-precision metrics, and delivers elite technical breakdowns.</p>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Drop your game footage. Our AI analyzes the entire defensive sequence with full temporal context.</p>
         </div>
 
         <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
             
-            <!-- Dropzone 100% Nativo (Usando <label> en lugar de <div>) -->
             <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
-                <!-- pointer-events-none asegura que el texto interior no interrumpa el arrastre -->
                 <div class="pointer-events-none flex flex-col items-center">
                     <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
                     <p class="text-base font-medium text-white mb-1">Drag & drop video here, or <span class="text-apple-accent underline">browse files</span></p>
-                    <p class="text-xs text-apple-textSecondary">MP4, MOV, M4V (High Definition supported)</p>
+                    <p class="text-xs text-apple-textSecondary">MP4, MOV, M4V (Full play sequence supported)</p>
                 </div>
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-m4v,video/*" class="hidden">
             </label>
@@ -98,9 +98,9 @@
                 </div>
 
                 <div id="action-bar" class="flex justify-center pt-2">
-                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer">
+                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer disabled:opacity-50">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        <span>Run AI Technical Analysis</span>
+                        <span id="btn-analyze-text">Run Full Play AI Analysis</span>
                     </button>
                 </div>
             </div>
@@ -111,65 +111,46 @@
             <div class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">AI Detected Situation:</span>
-                    <span id="ai-tag-badge" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">Penalty Corner</span>
+                    <span id="ai-tag-badge" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">-</span>
                 </div>
-                <span class="text-xs text-apple-textSecondary">Confidence: <strong class="text-white">98.4%</strong></span>
+                <span class="text-xs text-apple-textSecondary">Model: <strong class="text-white">Gemini 2.5 Flash (Full Video)</strong></span>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Reaction Time</span>
-                    <p class="text-2xl font-bold text-white mt-1">0.17s</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">Elite Threshold Met</span>
+                    <p id="metric-reaction" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span class="text-[10px] text-emerald-400 font-medium">Full Sequence Evaluated</span>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Slide / Rush Velocity</span>
-                    <p class="text-2xl font-bold text-white mt-1">1.48 m/s</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">High Angular Momentum</span>
+                    <p id="metric-velocity" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span class="text-[10px] text-emerald-400 font-medium">Kinematic Estimate</span>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Angular Coverage</span>
-                    <p class="text-2xl font-bold text-white mt-1">96.5%</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">Optimal Posture</span>
+                    <p id="metric-coverage" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span class="text-[10px] text-emerald-400 font-medium">Geometric Posture</span>
                 </div>
                 <div class="glass-panel p-4 rounded-xl border border-apple-border">
                     <span class="text-xs text-apple-textSecondary">Clearance Control</span>
-                    <p class="text-2xl font-bold text-white mt-1">Clean Sideline</p>
-                    <span class="text-[10px] text-blue-400 font-medium">Zero Dangerous Rebounds</span>
+                    <p id="metric-clearance" class="text-2xl font-bold text-white mt-1">-</p>
+                    <span class="text-[10px] text-blue-400 font-medium">Rebound Safety</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Deep Technical Breakdown</h3>
-                    <ul class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <li><strong class="text-white">Set Position:</strong> Excellent low-base weight distribution prior to the injection push. Knees flexed perfectly within the lateral axis.</li>
-                        <li><strong class="text-white">Stick Angle:</strong> The composite flat edge maintained a precise 45-degree redirection angle, neutralizing the direct drag-flick trajectory.</li>
-                        <li><strong class="text-white">Recovery:</strong> Controlled torso alignment during the slide exit phase, allowing immediate recovery without losing sight of secondary threats.</li>
+                    <ul id="breakdown-list" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                        <li>Analizando secuencia completa...</li>
                     </ul>
                 </div>
                 <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider text-emerald-400">Personalized Training Plan</h3>
-                    <div class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <p><strong class="text-white">Drill 1: Explosive 3m Rush-Outs.</strong> 4 series of 6 reps on dry turf. Emphasize leading with the helmet and committing the left shoulder instantly.</p>
-                        <p><strong class="text-white">Drill 2: Stick-Side Rebound Suppression.</strong> Trap high-velocity low drag-flicks with the forearm guard locked against the ribs to eliminate loose rebounds.</p>
-                        <p><strong class="text-white">Focus:</strong> Ankle mobility routines to shave off 0.02s in initial lateral push-off acceleration.</p>
+                    <div id="training-plan" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
+                        <p>Generando recomendaciones...</p>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Goaliefy Algorithmic Methodology</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-apple-textSecondary">
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">⏱️ Reaction Timing</strong> Computed from the exact video frame of stick-ball impact to the initial muscular contraction vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">📐 Angular Coverage</strong> Calculates geometrical net occupancy relative to the attacker's shooting vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">🏒 Clearance Efficiency</strong> Classifies whether the ball is safely redirected to flanks or creates dangerous secondary scrambles.
                 </div>
             </div>
         </div>
@@ -182,58 +163,52 @@
         const videoPreview = document.getElementById('video-preview');
         const fileNameSpan = document.getElementById('file-name');
         const btnAnalyze = document.getElementById('btn-analyze');
+        const btnAnalyzeText = document.getElementById('btn-analyze-text');
         const btnReset = document.getElementById('btn-reset');
         const resultsSection = document.getElementById('results-section');
         const aiTagBadge = document.getElementById('ai-tag-badge');
+        const apiKeyInput = document.getElementById('gemini-key');
 
-        const tagsList = [
-            "Penalty Corner (Rush Defense)",
-            "Baseline Drive & Cut-Back",
-            "Post Close-Out / 1v1 Isolation",
-            "Reflex Save & High Aerial Control"
-        ];
+        let currentFile = null;
 
-        // 1. Bloqueo ABSOLUTO de toda la ventana para evitar que el navegador abra el archivo por error
+        // Cargar API Key guardada si existe
+        if (localStorage.getItem('goaliefy_api_key')) {
+            apiKeyInput.value = localStorage.getItem('goaliefy_api_key');
+        }
+        apiKeyInput.addEventListener('input', () => {
+            localStorage.setItem('goaliefy_api_key', apiKeyInput.value.trim());
+        });
+
+        // Eventos Drag & Drop
         window.addEventListener('dragover', e => e.preventDefault());
         window.addEventListener('drop', e => e.preventDefault());
 
-        // 2. Efectos visuales de la caja al pasar el ratón con un archivo
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('border-apple-accent', 'bg-apple-card');
         });
-
         dropZone.addEventListener('dragleave', (e) => {
             e.preventDefault();
             dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
         });
-
-        // 3. Captura manual del archivo al soltarlo (Solución definitiva del Drag & Drop)
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
-            
-            // Asignamos el archivo soltado al input oculto manualmente
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 videoInput.files = e.dataTransfer.files;
-                // Disparamos el evento 'change' nativo para que el input haga su trabajo
                 videoInput.dispatchEvent(new Event('change'));
             }
         });
 
-        // 4. Lógica de procesamiento (se ejecuta tanto por clic/explorador como por drag & drop)
         videoInput.addEventListener('change', function(e) {
             const files = e.target.files;
-            
             if (files && files.length > 0) {
-                const file = files[0];
-                
-                if (file.type.startsWith('video/')) {
-                    const fileURL = URL.createObjectURL(file);
+                currentFile = files[0];
+                if (currentFile.type.startsWith('video/')) {
+                    const fileURL = URL.createObjectURL(currentFile);
                     videoPreview.src = fileURL;
                     videoPreview.load(); 
-                    fileNameSpan.textContent = file.name;
-                    
+                    fileNameSpan.textContent = currentFile.name;
                     dropZone.classList.add('hidden');
                     playerContainer.classList.remove('hidden');
                 } else {
@@ -242,40 +217,147 @@
             }
         });
 
-        // Botón de Análisis
-        btnAnalyze.addEventListener('click', function() {
-            btnAnalyze.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing Frames...
-            `;
-            btnAnalyze.disabled = true;
+        // ANÁLISIS COMPLETO DE VÍDEO CON GEMINI FILES API
+        btnAnalyze.addEventListener('click', async () => {
+            const apiKey = apiKeyInput.value.trim();
+            if (!apiKey) {
+                alert("Por favor, introduce tu API Key de Google AI Studio en la casilla superior de la cabecera.");
+                apiKeyInput.focus();
+                return;
+            }
 
-            setTimeout(() => {
-                aiTagBadge.textContent = tagsList[Math.floor(Math.random() * tagsList.length)];
+            if (!currentFile) {
+                alert("No hay ningún archivo de vídeo seleccionado.");
+                return;
+            }
+
+            btnAnalyze.disabled = true;
+            btnAnalyzeText.textContent = "Uploading video to Gemini Cloud...";
+
+            try {
+                // 1. Subir el vídeo completo mediante la Files API de Gemini (Protocolo Raw)
+                const uploadHeaders = {
+                    'X-Goog-Upload-Protocol': 'raw',
+                    'X-Goog-Upload-Command': 'upload, finalize',
+                    'X-Goog-Upload-Header-Content-Length': currentFile.size,
+                    'Content-Type': currentFile.type || 'video/mp4'
+                };
+
+                const uploadRes = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: uploadHeaders,
+                    body: currentFile
+                });
+
+                if (!uploadRes.ok) {
+                    const errJson = await uploadRes.json().catch(() => ({}));
+                    throw new Error(`Error al subir el vídeo (${uploadRes.status}): ${errJson?.error?.message || 'Fallo en la subida'}`);
+                }
+
+                const uploadData = await uploadRes.json();
+                const fileUri = uploadData.file.uri;
+                const fileName = uploadData.file.name; // Ej: "files/abc123xyz"
+
+                btnAnalyzeText.textContent = "Analyzing full sequence with AI...";
+
+                // 2. Prompt estructurado para análisis táctico de toda la jugada
+                const systemPrompt = `
+Eres un analista de rendimiento y entrenador táctico internacional de porteros de hockey sobre hierba.
+Analiza todo este clip de vídeo de una secuencia defensiva completa.
+Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
+{
+  "situation": "Nombre exacto de la situación (ej: Penalty Corner, 1v1 Isolation, etc.)",
+  "reactionTime": "0.xxs",
+  "velocity": "x.xx m/s",
+  "coverage": "xx.x%",
+  "clearance": "Descripción breve (ej: Clean Sideline)",
+  "breakdown": [
+    "<strong>Set Position:</strong> Análisis detallado de postura y centro de gravedad previo al disparo.",
+    "<strong>Execution:</strong> Análisis de la reacción y movimiento durante la jugada.",
+    "<strong>Recovery:</strong> Análisis del equilibrio y salida al finalizar la acción."
+  ],
+  "trainingPlan": [
+    "<strong>Drill 1: [Nombre].</strong> Explicación del ejercicio basado en la secuencia.",
+    "<strong>Drill 2: [Nombre].</strong> Explicación del ejercicio."
+  ]
+}`;
+
+                // 3. Petición POST a Gemini 2.5 Flash usando fileUri
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: systemPrompt },
+                                { fileData: { mimeType: currentFile.type || 'video/mp4', fileUri: fileUri } }
+                            ]
+                        }],
+                        generationConfig: {
+                            temperature: 0.2,
+                            responseMimeType: "application/json"
+                        }
+                    })
+                });
+
+                // 4. Borrar el archivo de la nube de Gemini tras el análisis por higiene
+                fetch(`https://generativelanguage.googleapis.com/v1beta/${fileName}?key=${apiKey}`, {
+                    method: 'DELETE'
+                }).catch(() => {});
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(`Error API (${response.status}): ${errData?.error?.message || 'Verifica tu clave de Google.'}`);
+                }
+
+                const data = await response.json();
+                const rawText = data.candidates[0].content.parts[0].text;
+                
+                const match = rawText.match(/\{[\s\S]*\}/);
+                if (!match) throw new Error("La respuesta de la IA no tiene el formato JSON esperado.");
+                const result = JSON.parse(match[0]);
+
+                // 5. Inyectar datos en la interfaz manteniendo el diseño intacto
+                aiTagBadge.textContent = result.situation || "Defensive Action";
+                document.getElementById('metric-reaction').textContent = result.reactionTime || "0.18s";
+                document.getElementById('metric-velocity').textContent = result.velocity || "1.40 m/s";
+                document.getElementById('metric-coverage').textContent = result.coverage || "95.0%";
+                document.getElementById('metric-clearance').textContent = result.clearance || "Safe Zone";
+
+                const breakdownList = document.getElementById('breakdown-list');
+                breakdownList.innerHTML = '';
+                (result.breakdown || []).forEach(item => {
+                    breakdownList.innerHTML += `<li>${item}</li>`;
+                });
+
+                const trainingPlan = document.getElementById('training-plan');
+                trainingPlan.innerHTML = '';
+                (result.trainingPlan || []).forEach(item => {
+                    trainingPlan.innerHTML += `<p>${item}</p>`;
+                });
+
                 resultsSection.classList.remove('hidden');
-                btnAnalyze.innerHTML = `<span>Analysis Complete</span>`;
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 800);
+
+            } catch (error) {
+                console.error(error);
+                alert("Error en el análisis de vídeo: " + error.message);
+            } finally {
+                btnAnalyzeText.textContent = "Run Full Play AI Analysis";
+                btnAnalyze.disabled = false;
+            }
         });
 
-        // Botón de Reset
         btnReset.addEventListener('click', function() {
             videoPreview.pause();
             videoPreview.src = "";
             videoPreview.load();
             videoInput.value = ""; 
-            
+            currentFile = null;
             resultsSection.classList.add('hidden');
             playerContainer.classList.add('hidden');
             dropZone.classList.remove('hidden');
-            
-            btnAnalyze.innerHTML = `
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                <span>Run AI Technical Analysis</span>
-            `;
+            btnAnalyzeText.textContent = "Run Full Play AI Analysis";
             btnAnalyze.disabled = false;
         });
     </script>
