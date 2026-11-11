@@ -203,4 +203,92 @@
 
     <!-- User Profile Modal -->
     <div id="profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-        <div class="glass-panel rounded-2xl p-6 max-w-md w-full border border-apple-border space
+        <div class="glass-panel rounded-2xl p-6 max-w-md w-full border border-apple-border space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white">User Account & Profile</h3>
+                <button id="close-modal" class="text-apple-textSecondary hover:text-white text-sm">✕</button>
+            </div>
+            <p class="text-xs text-apple-textSecondary">Configure your goalkeeper profile to personalize your analysis reports and history vault.</p>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-apple-textSecondary mb-1">Full Name</label>
+                    <input type="text" id="input-name" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" placeholder="e.g. Daniel Hernández">
+                </div>
+                <div>
+                    <label class="block text-apple-textSecondary mb-1">Email Address</label>
+                    <input type="email" id="input-email" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" placeholder="e.g. daniel@goaliefy.app">
+                </div>
+                <div>
+                    <label class="block text-apple-textSecondary mb-1">Club / Team</label>
+                    <input type="text" id="input-club" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" placeholder="e.g. CD Terrassa Hockey">
+                </div>
+            </div>
+            <button id="btn-save-profile" class="w-full bg-apple-accent text-white font-medium text-xs py-2.5 rounded-xl hover:bg-blue-600 transition">Save Account Profile</button>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const videoInput = document.getElementById('video-upload');
+        const playerContainer = document.getElementById('player-container');
+        const videoPreview = document.getElementById('video-preview');
+        const fileNameSpan = document.getElementById('file-name');
+        const btnAnalyze = document.getElementById('btn-analyze');
+        const btnAnalyzeText = document.getElementById('btn-analyze-text');
+        const btnReset = document.getElementById('btn-reset');
+        const resultsSection = document.getElementById('results-section');
+        const aiTagBadge = document.getElementById('ai-tag-badge');
+        const apiKeyInput = document.getElementById('gemini-key');
+        
+        // Profile Modal Elements
+        const userPill = document.getElementById('user-pill');
+        const profileModal = document.getElementById('profile-modal');
+        const closeModal = document.getElementById('close-modal');
+        const btnSaveProfile = document.getElementById('btn-save-profile');
+        const userDisplayName = document.getElementById('user-display-name');
+        const userInitials = document.getElementById('user-initials');
+        const vaultUserEmail = document.getElementById('vault-user-email');
+        const vaultBody = document.getElementById('vault-body');
+
+        let currentFile = null;
+
+        // Load or Prompt User Profile
+        function loadUserProfile() {
+            const savedProfile = localStorage.getItem('goaliefy_user');
+            if (!savedProfile) {
+                profileModal.classList.remove('hidden');
+                return;
+            }
+            const profile = JSON.parse(savedProfile);
+            userDisplayName.textContent = profile.name || 'Goalkeeper';
+            vaultUserEmail.textContent = profile.email || 'user@goaliefy.app';
+            const initials = (profile.name || 'G').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            userInitials.textContent = initials || 'GK';
+            document.getElementById('input-name').value = profile.name || '';
+            document.getElementById('input-email').value = profile.email || '';
+            document.getElementById('input-club').value = profile.club || '';
+        }
+
+        userPill.addEventListener('click', () => profileModal.classList.remove('hidden'));
+        closeModal.addEventListener('click', () => profileModal.classList.add('hidden'));
+        
+        btnSaveProfile.addEventListener('click', () => {
+            const name = document.getElementById('input-name').value.trim();
+            const email = document.getElementById('input-email').value.trim();
+            const club = document.getElementById('input-club').value.trim();
+
+            if (!name || !email) {
+                alert("Please enter at least your name and email.");
+                return;
+            }
+
+            const profile = { name, email, club };
+            localStorage.setItem('goaliefy_user', JSON.stringify(profile));
+            loadUserProfile();
+            profileModal.classList.add('hidden');
+        });
+
+        loadUserProfile();
+
+        // Load Vault History
+        function load
