@@ -1,73 +1,125 @@
-export default async function handler(req, res) {
-  // Solo aceptamos peticiones POST desde el frontend
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
-    const { imageBase64 } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Falta configurar GEMINI_API_KEY en las variables de entorno de Vercel.' });
-    }
-    if (!imageBase64) {
-      return res.status(400).json({ error: 'No se recibió el fotograma del vídeo.' });
-    }
-
-    const systemPrompt = `
-Eres un analista de rendimiento y entrenador de porteros táctico de élite.
-Analiza este fotograma de una jugada defensiva.
-Clasifica obligatoriamente la situación en UNA categoría táctica defensiva.
-Evalúa objetivamente del 1 al 10 la Toma de Decisiones y la Ejecución Técnica biomecánica visible.
-
-Responde ÚNICAMENTE con un objeto JSON válido, sin bloques Markdown, con esta estructura:
-{
-  "situation": "Nombre de la situación",
-  "decisionScore": 8,
-  "decisionDesc": "Análisis táctico de la decisión.",
-  "execScore": 7,
-  "execDesc": "Análisis biomecánico (postura, stick, pies).",
-  "strategy": "Estrategia recomendada."
-}`;
-
-    // Llamada directa vía REST API (a prueba de fallos de dependencias Node)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            { text: systemPrompt },
-            { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
-          ]
-        }],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: "application/json"
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goaliefy | Análisis de Porteros por IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        apple: {
+                            bg: '#000000',
+                            card: '#161617',
+                            border: '#333336',
+                            textPrimary: '#f5f5f7',
+                            textSecondary: '#86868b',
+                            accent: '#2997ff'
+                        }
+                    }
+                }
+            }
         }
-      })
-    });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            background-color: #000000;
+            color: #f5f5f7;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(22, 22, 23, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Error API Gemini: ${errorData.error?.message || response.status}`);
-    }
+    <!-- Header con Input para API Key -->
+    <header class="w-full border-b border-apple-border px-6 py-4 flex flex-col md:flex-row md:items-center justify-between glass-panel sticky top-0 z-50 gap-4">
+        <div class="flex items-center space-x-3">
+            <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 4L6 8V15C6 21.5 10.3 27.5 16 30C21.7 27.5 26 21.5 26 15V8L16 4Z" fill="#2997ff"/>
+                <path d="M20 14C19.2 12.2 17.7 11 16 11C13.2 11 11 13.2 11 16C11 18.8 13.2 21 16 21C18.8 21 21 18.8 21 16H16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-48 md:w-64">
+            </div>
+        </div>
+    </header>
 
-    const data = await response.json();
-    const rawText = data.candidates[0].content.parts[0].text;
-    
-    // Limpieza de formato para garantizar JSON
-    const match = rawText.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error("La IA no devolvió un formato JSON válido.");
-    
-    // Respuesta exitosa al frontend
-    res.status(200).json(JSON.parse(match[0]));
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
+        
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-bold tracking-tight text-white">Análisis de Vídeo por Inteligencia Artificial</h1>
+            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Sube tu clip, reprodúcelo hasta el fotograma clave de la jugada defensiva y pulsa analizar.</p>
+        </div>
 
-  } catch (error) {
-    console.error("Error en Backend:", error);
-    res.status(500).json({ error: error.message });
-  }
-}
+        <!-- Sección de Subida y Reproductor -->
+        <div class="glass-panel rounded-2xl p-6 border border-apple-border relative space-y-6">
+            
+            <!-- Panel Drag & Drop -->
+            <div id="upload-panel" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center bg-black/40 gap-4 transition-colors">
+                <svg class="w-12 h-12 text-apple-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <div class="space-y-1">
+                    <p class="text-base font-medium text-white">Sube o arrastra un clip de vídeo</p>
+                    <p class="text-xs text-apple-textSecondary">Formatos MP4 / MOV</p>
+                </div>
+                <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/*" class="block w-full max-w-xs text-sm text-apple-textSecondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-apple-accent file:text-white hover:file:bg-blue-600 file:cursor-pointer cursor-pointer">
+            </div>
+
+            <!-- Reproductor de Vídeo -->
+            <div id="player-container" class="hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <span id="file-name" class="text-xs font-medium text-apple-accent truncate max-w-[200px] md:max-w-xs"></span>
+                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer">Cambiar vídeo</button>
+                </div>
+
+                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex flex-col items-center justify-center">
+                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                </div>
+
+                <!-- Botón de Análisis IA -->
+                <div class="flex justify-center pt-2">
+                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 cursor-pointer flex items-center space-x-2 disabled:opacity-50">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span id="btn-analyze-text">Analizar Momento Clave (IA)</span>
+                    </button>
+                </div>
+                
+                <div id="ai-status" class="hidden text-center text-xs font-mono text-apple-accent mt-2 animate-pulse">
+                    Procesando y enviando captura a Gemini...
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard de Resultados -->
+        <div id="results-section" class="hidden space-y-6">
+            
+            <div class="glass-panel p-4 rounded-xl border border-apple-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">Situación Detectada:</span>
+                        <span id="dyn-situation" class="px-3 py-1 rounded-full bg-apple-card border border-apple-border text-white text-xs font-bold">-</span>
+                    </div>
+                </div>
+                <div class="text-xs text-apple-textSecondary">Gemini 2.5 Flash</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Métrica 1 -->
+                <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
+                    <div class="flex items-center justify-
