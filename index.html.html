@@ -83,9 +83,9 @@
         <!-- Upload & Player Section -->
         <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
             
-            <!-- Dropzone -->
-            <div id="upload-zone" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full">
-                <div class="flex flex-col items-center space-y-2 pointer-events-none">
+            <!-- Bulletproof Native Dropzone Label -->
+            <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-10 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
+                <div class="pointer-events-none flex flex-col items-center space-y-2">
                     <svg class="w-12 h-12 text-apple-textSecondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-m4v,video/*" class="hidden">
-            </div>
+            </label>
 
             <!-- Video Player -->
             <div id="player-container" class="hidden space-y-4">
@@ -178,7 +178,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">User History & Vault</h3>
-                    <p class="text-xs text-apple-textSecondary mt-0.5">Stored analyses for <span id="vault-user-email" class="text-white font-medium">daniel@goaliefy.app</span></p>
+                    <p class="text-xs text-apple-textSecondary mt-0.5">Stored analyses for <span id="vault-user-email" class="text-white font-medium">-</span></p>
                 </div>
                 <button id="btn-clear-vault" class="text-xs text-apple-textSecondary hover:text-red-400 transition underline cursor-pointer">Clear History</button>
             </div>
@@ -203,204 +203,4 @@
 
     <!-- User Profile Modal -->
     <div id="profile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-        <div class="glass-panel rounded-2xl p-6 max-w-md w-full border border-apple-border space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-white">User Profile Settings</h3>
-                <button id="close-modal" class="text-apple-textSecondary hover:text-white text-sm">✕</button>
-            </div>
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-apple-textSecondary mb-1">Full Name</label>
-                    <input type="text" id="input-name" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" value="Daniel Hernández">
-                </div>
-                <div>
-                    <label class="block text-apple-textSecondary mb-1">Email Address (for future reports)</label>
-                    <input type="email" id="input-email" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" value="daniel@goaliefy.app">
-                </div>
-                <div>
-                    <label class="block text-apple-textSecondary mb-1">Club / Team</label>
-                    <input type="text" id="input-club" class="w-full bg-black/50 border border-apple-border rounded-lg px-3 py-2 text-white focus:outline-none focus:border-apple-accent" value="CD Terrassa Hockey">
-                </div>
-            </div>
-            <button id="btn-save-profile" class="w-full bg-apple-accent text-white font-medium text-xs py-2.5 rounded-xl hover:bg-blue-600 transition">Save Profile</button>
-        </div>
-    </div>
-
-    <script>
-        const uploadZone = document.getElementById('upload-zone');
-        const videoInput = document.getElementById('video-upload');
-        const playerContainer = document.getElementById('player-container');
-        const videoPreview = document.getElementById('video-preview');
-        const fileNameSpan = document.getElementById('file-name');
-        const btnAnalyze = document.getElementById('btn-analyze');
-        const btnAnalyzeText = document.getElementById('btn-analyze-text');
-        const btnReset = document.getElementById('btn-reset');
-        const resultsSection = document.getElementById('results-section');
-        const aiTagBadge = document.getElementById('ai-tag-badge');
-        const apiKeyInput = document.getElementById('gemini-key');
-        
-        // Profile Modal Elements
-        const userPill = document.getElementById('user-pill');
-        const profileModal = document.getElementById('profile-modal');
-        const closeModal = document.getElementById('close-modal');
-        const btnSaveProfile = document.getElementById('btn-save-profile');
-        const userDisplayName = document.getElementById('user-display-name');
-        const userInitials = document.getElementById('user-initials');
-        const vaultUserEmail = document.getElementById('vault-user-email');
-        const vaultBody = document.getElementById('vault-body');
-
-        let currentFile = null;
-
-        // Load User Profile Data
-        function loadUserProfile() {
-            const profile = JSON.parse(localStorage.getItem('goaliefy_user')) || { name: 'Daniel Hernández', email: 'daniel@goaliefy.app', club: 'CD Terrassa Hockey' };
-            userDisplayName.textContent = profile.name;
-            vaultUserEmail.textContent = profile.email;
-            const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            userInitials.textContent = initials;
-            document.getElementById('input-name').value = profile.name;
-            document.getElementById('input-email').value = profile.email;
-            document.getElementById('input-club').value = profile.club;
-        }
-
-        userPill.addEventListener('click', () => profileModal.classList.remove('hidden'));
-        closeModal.addEventListener('click', () => profileModal.classList.add('hidden'));
-        btnSaveProfile.addEventListener('click', () => {
-            const profile = {
-                name: document.getElementById('input-name').value.trim(),
-                email: document.getElementById('input-email').value.trim(),
-                club: document.getElementById('input-club').value.trim()
-            };
-            localStorage.setItem('goaliefy_user', JSON.stringify(profile));
-            loadUserProfile();
-            profileModal.classList.add('hidden');
-        });
-        loadUserProfile();
-
-        // Load Vault History
-        function loadVault() {
-            const vault = JSON.parse(localStorage.getItem('goaliefy_vault')) || [];
-            vaultBody.innerHTML = '';
-            if (vault.length === 0) {
-                vaultBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-apple-textSecondary">No analysis history recorded yet.</td></tr>`;
-                return;
-            }
-            vault.reverse().forEach(item => {
-                vaultBody.innerHTML += `
-                    <tr class="border-b border-apple-border/50 hover:bg-apple-card/40 transition">
-                        <td class="py-3 text-apple-textSecondary">${item.date}</td>
-                        <td class="py-3 font-medium truncate max-w-[140px]">${item.filename}</td>
-                        <td class="py-3"><span class="px-2 py-1 rounded bg-apple-accent/10 text-apple-accent text-[10px] font-bold">${item.situation}</span></td>
-                        <td class="py-3 font-mono font-bold text-emerald-400">${item.reaction}</td>
-                        <td class="py-3 font-mono text-apple-textSecondary">${item.velocity}</td>
-                    </tr>
-                `;
-            });
-        }
-        document.getElementById('btn-clear-vault').addEventListener('click', () => {
-            localStorage.removeItem('goaliefy_vault');
-            loadVault();
-        });
-        loadVault();
-
-        // API Key persistence
-        if (localStorage.getItem('goaliefy_api_key')) {
-            apiKeyInput.value = localStorage.getItem('goaliefy_api_key');
-        }
-        apiKeyInput.addEventListener('input', () => {
-            localStorage.setItem('goaliefy_api_key', apiKeyInput.value.trim());
-        });
-
-        // Click zone opens file dialog
-        uploadZone.addEventListener('click', () => videoInput.click());
-
-        // Drag & Drop handling
-        window.addEventListener('dragover', e => e.preventDefault());
-        window.addEventListener('drop', e => e.preventDefault());
-
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('border-apple-accent', 'bg-apple-card');
-        });
-        uploadZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('border-apple-accent', 'bg-apple-card');
-        });
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('border-apple-accent', 'bg-apple-card');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                processFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        videoInput.addEventListener('change', function(e) {
-            if (this.files && this.files.length > 0) {
-                processFile(this.files[0]);
-            }
-        });
-
-        // Robust file reader loading (prevents black screens)
-        function processFile(file) {
-            if (!file.type.startsWith('video/')) {
-                alert("Please upload a valid video file (MP4, MOV).");
-                return;
-            }
-            currentFile = file;
-            fileNameSpan.textContent = file.name;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const blob = new Blob([event.target.result], { type: file.type || 'video/mp4' });
-                videoPreview.src = URL.createObjectURL(blob);
-                videoPreview.load();
-
-                uploadZone.classList.add('hidden');
-                playerContainer.classList.remove('hidden');
-                resultsSection.classList.add('hidden');
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        // Retry fetch utility
-        async function fetchWithRetry(url, options, maxRetries = 3, delay = 3000) {
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                try {
-                    const res = await fetch(url, options);
-                    if (res.status === 503 || res.status === 429) {
-                        if (attempt < maxRetries - 1) {
-                            btnAnalyzeText.textContent = `Server busy (503). Retrying (${attempt + 1}/${maxRetries})...`; await new Promise(r => setTimeout(r, delay)); continue; } } return res; } catch (err) { if (attempt === maxRetries - 1) throw err; await new Promise(r => setTimeout(r, delay)); } } }  // Analysis Execution btnAnalyze.addEventListener('click', async () => { const apiKey = apiKeyInput.value.trim(); if (!apiKey) { alert("Please enter your Gemini API Key in the top header box."); apiKeyInput.focus(); return; }  if (!currentFile) { alert("No video file selected."); return; }  btnAnalyze.disabled = true; btnAnalyzeText.textContent = "Uploading video to Gemini Cloud...";  try { const uploadHeaders = { 'X-Goog-Upload-Protocol': 'raw', 'X-Goog-Upload-Command': 'upload, finalize', 'X-Goog-Upload-Header-Content-Length': currentFile.size, 'Content-Type': currentFile.type \vert{}\vert{} 'video/mp4' };  const uploadRes = await fetchWithRetry(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: uploadHeaders,
-                    body: currentFile
-                });
-
-                if (!uploadRes.ok) {
-                    const errJson = await uploadRes.json().catch(() => ({}));
-                    throw new Error(`Upload failed (${uploadRes.status}):${errJson?.error?.message || 'Server error'}`);
-                }
-
-                const uploadData = await uploadRes.json();
-                const fileUri = uploadData.file.uri;
-                const fileName = uploadData.file.name;
-
-                btnAnalyzeText.textContent = "Analyzing full sequence with AI...";
-
-                const systemPrompt = `
-You are an elite field hockey goalkeeper performance analyst and tactical coach.
-Analyze this video clip of a complete defensive sequence.
-Return the results in a valid JSON object (no additional markdown format, pure JSON only) with exactly this structure:
-{
-  "situation": "Exact tactical situation (e.g., Penalty Corner, 1v1 Isolation, Aerial Deflection)",
-  "reactionTime": "0.xxs",
-  "velocity": "x.xx m/s",
-  "coverage": "xx.x%",
-  "clearance": "Short description (e.g., Clean Sideline)",
-  "breakdown": [
-    "<strong>Set Position:</strong> Detailed analysis of stance and center of gravity prior to the shot.",
-    "<strong>Execution:</strong> Analysis of reaction and movement during the play.",
-    "<strong>Recovery:</strong> Analysis of balance and post-save repositioning."
-  ],
-  "trainingPlan": [
-    "<strong>Drill 1: [Name].</strong> Explanation of the exercise based on the sequence.",
-    "<strong>Drill 2:
+        <div class="glass-panel rounded-2xl p-6 max-w-md w-full border border-apple-border space
