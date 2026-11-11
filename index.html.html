@@ -1,48 +1,55 @@
+// Archivo: api/analyze.js
 import { GoogleGenAI } from '@google/genai';
-import { GoogleAIFileManager } from '@google/genai/files';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const fileManager = new GoogleAIFileManager({ apiKey: process.env.GEMINI_API_KEY });
+export default async function handler(req, res) {
+    // Solo permitimos peticiones POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido' });
+    }
 
-export async function handleVideoAnalysis(filePath, mimeType) {
-  // 1. Cargar archivo a la Files API de Gemini
-  const uploadResult = await fileManager.uploadFile(filePath, {
-    mimeType: mimeType,
-    displayName: "Goalkeeper Action Clip",
-  });
+    try {
+        const { imageBase64 } = req.body;
+        
+        if (!imageBase64) {
+            return res.status(400).json({ error: 'No se ha recibido el fotograma de la jugada.' });
+        }
 
-  // 2. Definir el System Prompt de Entrenador de Élite
-  const systemInstruction = `
-Eres un entrenador de porteros de hockey sobre hierba de nivel internacional.
-Analiza detenidamente el vídeo adjunto de la acción defensiva del portero.
+        // Inicializamos Gemini usando la variable de entorno de Vercel (totalmente oculta al usuario)
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-Debes responder ÚNICAMENTE con un JSON con la siguiente estructura:
+        const systemInstruction = `
+Eres un analista de rendimiento y entrenador de porteros de hockey sobre hierba de élite.
+Analiza este fotograma de una jugada defensiva.
+Clasifica la situación en UNA categoría táctica (ej: Penalty Corner, 1v1, Bola Aérea, etc).
+Evalúa del 1 al 10 la Toma de Decisiones y la Ejecución Técnica.
+
+Responde ÚNICAMENTE con un JSON válido con esta estructura:
 {
-  "actionType": "Nombre exacto de la jugada",
+  "situation": "Nombre de la jugada",
   "decisionScore": 8,
-  "decisionAnalysis": "Evaluación táctica del momento de decisión y posicionamiento.",
-  "executionScore": 7,
-  "executionAnalysis": "Análisis biomecánico: centro de gravedad, colocación del stick y uso de guardas/pies.",
-  "strengths": ["Punto fuerte 1", "Punto fuerte 2"],
-  "coachingTips": ["Consejo de mejora 1", "Ejercicio recomendado para corregir el error"]
+  "decisionDesc": "Análisis táctico de la decisión.",
+  "execScore": 7,
+  "execDesc": "Análisis biomecánico (postura, stick, pies).",
+  "strategy": "Estrategia de mejora."
 }`;
 
-  // 3. Ejecutar análisis multimodal con Gemini 2.5 Flash
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: [
-      uploadResult.file,
-      { text: "Realiza el análisis biomecánico y táctico completo de esta acción defensiva del portero." }
-    ],
-    config: {
-      systemInstruction: systemInstruction,
-      responseMimeType: "application/json",
-      temperature: 0.2
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: [
+                { text: systemInstruction },
+                { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
+            ],
+            config: {
+                responseMimeType: "application/json",
+                temperature: 0.2
+            }
+        });
+
+        // Devolvemos el JSON limpio al frontend
+        res.status(200).json(JSON.parse(response.text));
+
+    } catch (error) {
+        console.error("Error en Backend:", error);
+        res.status(500).json({ error: 'Error procesando la IA: ' + error.message });
     }
-  });
-
-  // 4. Limpieza del archivo en la nube
-  await fileManager.deleteFile(uploadResult.file.name);
-
-  return JSON.parse(response.text);
 }
