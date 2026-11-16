@@ -118,26 +118,41 @@
                 <span class="text-xs text-apple-textSecondary">Model: <strong class="text-white">Gemini 3.8 Flash (Full Video)</strong></span>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Reaction Time</span>
-                    <p id="metric-reaction" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">Full Sequence Evaluated</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Outcome</span>
+                    <p id="metric-outcome" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-amber-400 font-medium">Match Status</span>
                 </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Slide / Rush Velocity</span>
-                    <p id="metric-velocity" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">Kinematic Estimate</span>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Shot Velocity</span>
+                    <p id="metric-shot-velocity" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-emerald-400 font-medium">1er Disparo</span>
                 </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Angular Coverage</span>
-                    <p id="metric-coverage" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span class="text-[10px] text-emerald-400 font-medium">Geometric Posture</span>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Clearance Vel.</span>
+                    <p id="metric-clearance-velocity" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-blue-400 font-medium">Velocidad Despeje</span>
                 </div>
-                <div class="glass-panel p-4 rounded-xl border border-apple-border">
-                    <span class="text-xs text-apple-textSecondary">Clearance Control</span>
-                    <p id="metric-clearance" class="text-2xl font-bold text-white mt-1">-</p>
-                    <span class="text-[10px] text-blue-400 font-medium">Rebound Safety</span>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Reaction Time</span>
+                    <p id="metric-reaction" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-emerald-400 font-medium">Sequence Eval</span>
+                </div>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Slide Velocity</span>
+                    <p id="metric-velocity" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-emerald-400 font-medium">Kinematic</span>
+                </div>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Angular Cov.</span>
+                    <p id="metric-coverage" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-emerald-400 font-medium">Posture</span>
+                </div>
+                <div class="glass-panel p-3 rounded-xl border border-apple-border">
+                    <span class="text-[11px] text-apple-textSecondary">Clearance Control</span>
+                    <p id="metric-clearance" class="text-lg font-bold text-white mt-1">-</p>
+                    <span class="text-[9px] text-blue-400 font-medium">Rebound Safety</span>
                 </div>
             </div>
 
@@ -302,10 +317,13 @@ Analiza todo este clip de vídeo de una secuencia defensiva completa.
 Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
 {
   "situation": "Nombre exacto de la situación (ej: Penalty Corner, 1v1 Isolation, etc.)",
+  "outcome": "Desenlace exacto de la acción (ej: Goal, Saved, Cleared, Conceded)",
+  "shotVelocity": "Velocidad estimada del primer disparo (ej: 85 km/h) o cadena vacía si no hay disparo en el vídeo",
+  "clearanceVelocity": "Velocidad estimada del despeje o intervención del portero (ej: 45 km/h) o cadena vacía si no hay acción de despeje",
   "reactionTime": "0.xxs",
   "velocity": "x.xx m/s",
   "coverage": "xx.x%",
-  "clearance": "Descripción breve (ej: Clean Sideline)",
+  "clearance": "Descripción breve del control de rebote",
   "breakdown": [
     "<strong>Set Position:</strong> Análisis detallado de postura y centro de gravedad previo al disparo.",
     "<strong>Execution:</strong> Análisis de la reacción y movimiento durante la jugada.",
@@ -351,10 +369,13 @@ Devuelve los resultados en un objeto JSON válido (sin formato Markdown adiciona
                 const result = JSON.parse(match[0]);
 
                 aiTagBadge.textContent = result.situation || "Defensive Action";
-                document.getElementById('metric-reaction').textContent = result.reactionTime || "0.18s";
-                document.getElementById('metric-velocity').textContent = result.velocity || "1.40 m/s";
-                document.getElementById('metric-coverage').textContent = result.coverage || "95.0%";
-                document.getElementById('metric-clearance').textContent = result.clearance || "Safe Zone";
+                document.getElementById('metric-outcome').textContent = result.outcome || "-";
+                document.getElementById('metric-shot-velocity').textContent = result.shotVelocity || "-";
+                document.getElementById('metric-clearance-velocity').textContent = result.clearanceVelocity || "-";
+                document.getElementById('metric-reaction').textContent = result.reactionTime || "-";
+                document.getElementById('metric-velocity').textContent = result.velocity || "-";
+                document.getElementById('metric-coverage').textContent = result.coverage || "-";
+                document.getElementById('metric-clearance').textContent = result.clearance || "-";
 
                 const breakdownList = document.getElementById('breakdown-list');
                 breakdownList.innerHTML = '';
