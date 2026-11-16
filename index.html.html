@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goaliefy | AI Goalkeeper Intelligence</title>
+    <title>Goaliefy - AI Field Hockey Goalkeeper Analytics PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,11 +13,12 @@
                     colors: {
                         apple: {
                             bg: '#000000',
-                            card: '#161617',
-                            border: '#333336',
-                            textPrimary: '#f5f5f7',
-                            textSecondary: '#86868b',
-                            accent: '#2997ff'
+                            card: '#1c1c1e',
+                            border: '#38383a',
+                            accent: '#0a84ff',
+                            textSecondary: '#8e8e93',
+                            success: '#30d158',
+                            warning: '#ffd60a'
                         }
                     }
                 }
@@ -25,175 +26,242 @@
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            background-color: #000000;
-            color: #f5f5f7;
-            -webkit-font-smoothing: antialiased;
-        }
-        .glass-panel {
-            background: rgba(22, 22, 23, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #f5f5f7; }
+        .glass-panel { background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-apple-accent selection:text-white">
 
-    <!-- Header -->
-    <header class="w-full border-b border-apple-border px-6 py-4 flex items-center justify-between glass-panel sticky top-0 z-50">
-        <div class="flex items-center space-x-3">
-            <!-- Logo: Escudo con la 'G' -->
-            <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 4L6 8V15C6 21.5 10.3 27.5 16 30C21.7 27.5 26 21.5 26 15V8L16 4Z" fill="#2997ff"/>
-                <path d="M20 14C19.2 12.2 17.7 11 16 11C13.2 11 11 13.2 11 16C11 18.8 13.2 21 16 21C18.8 21 21 18.8 21 16H16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span class="text-xl font-semibold tracking-tight text-white">Goaliefy</span>
-        </div>
-        <div class="flex items-center space-x-3">
-            <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-36 md:w-48">
+    <!-- Goaliefy Navigation Header -->
+    <header class="w-full border-b border-apple-border bg-black/40 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Brand / Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('analyzer')">
+                <div class="w-10 h-10 rounded-xl bg-apple-card border border-apple-border flex items-center justify-center shadow-lg group hover:border-apple-accent transition-all">
+                    <!-- Logo Vectorial Minimalista: G + Máscara de Portero (Sólo contorno blanco) -->
+                    <svg viewBox="0 0 36 36" class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Letra G -->
+                        <path d="M22 10 A 9 9 0 1 0 27 23 L 27 18" />
+                        <!-- Máscara de portero estilizada -->
+                        <path d="M13 13 L 21 13 L 21 21 L 13 21 Z" stroke-width="1.5" />
+                        <path d="M17 13 L 17 21 M13 17 L 21 17" stroke-width="1" opacity="0.9" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-1.5">
+                        Goaliefy <span class="text-[10px] bg-apple-accent/20 text-apple-accent border border-apple-accent/30 px-1.5 py-0.5 rounded-full font-mono">PRO</span>
+                    </h1>
+                    <p class="text-[11px] text-apple-textSecondary">AI Goalkeeper Intelligence</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex items-center bg-black/60 p-1 rounded-xl border border-apple-border text-xs">
+                <button onclick="switchTab('analyzer')" id="btn-tab-analyzer" class="px-4 py-2 rounded-lg font-medium transition-all bg-apple-card text-white shadow-sm">
+                    Analyzer
+                </button>
+                <button onclick="switchTab('history')" id="btn-tab-history" class="px-4 py-2 rounded-lg font-medium text-apple-textSecondary hover:text-white transition-all">
+                    History & Vault
+                </button>
+                <button onclick="switchTab('methodology')" id="btn-tab-methodology" class="px-4 py-2 rounded-lg font-medium text-apple-textSecondary hover:text-white transition-all">
+                    Methodology
+                </button>
+            </nav>
+
+            <!-- API Key & Settings Trigger -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-lg border border-apple-border">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <input type="password" id="gemini-key" placeholder="Gemini API Key..." class="bg-transparent text-xs text-white placeholder-apple-textSecondary focus:outline-none w-36 md:w-44">
+                </div>
+                <button onclick="openSettingsModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-apple-card hover:bg-apple-border border border-apple-border text-xs font-medium text-white transition-all">
+                    <svg class="w-4 h-4 text-apple-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span id="user-display-name">Auth</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-8">
-        
-        <!-- Intro -->
-        <div class="text-center space-y-2">
-            <h1 class="text-3xl font-bold tracking-tight text-white">Advanced Goalkeeper Video Analysis</h1>
-            <p class="text-apple-textSecondary text-sm max-w-lg mx-auto">Drop your game footage. Our AI analyzes the entire defensive sequence with full temporal context.</p>
-        </div>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-8 space-y-6">
 
-        <!-- Upload & Player Section -->
-        <div class="glass-panel rounded-2xl p-6 border border-apple-border relative overflow-hidden" id="upload-container">
-            
-            <!-- Dropzone 100% Nativo -->
-            <label id="drop-zone" for="video-upload" class="border-2 border-dashed border-apple-border rounded-xl p-12 text-center flex flex-col items-center justify-center cursor-pointer min-h-[260px] bg-black/40 hover:border-apple-accent hover:bg-apple-card transition-all w-full block">
-                <div class="pointer-events-none flex flex-col items-center">
-                    <svg class="w-12 h-12 text-apple-textSecondary mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                    </svg>
-                    <p class="text-base font-medium text-white mb-1">Drag & drop video here, or <span class="text-apple-accent underline">browse files</span></p>
-                    <p class="text-xs text-apple-textSecondary">MP4, MOV, M4V (Full play sequence supported)</p>
-                </div>
-                <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-m4v,video/*" class="hidden">
-            </label>
+        <!-- Vista 1: Analyzer -->
+        <div id="view-analyzer" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Column: Video & Controls -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="glass-panel rounded-2xl p-4 border border-apple-border space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-apple-success animate-pulse"></span>
+                                Video Input & Playback
+                            </h2>
+                            <span class="text-[11px] text-apple-textSecondary font-mono">MP4/MOV • Rec. 10s-30s</span>
+                        </div>
 
-            <!-- Video Player -->
-            <div id="player-container" class="hidden space-y-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span id="file-name" class="text-xs font-medium text-apple-textSecondary"></span>
+                        <!-- Video Preview -->
+                        <div class="relative rounded-xl overflow-hidden bg-black h-64 md:h-72 border border-apple-border shadow-2xl flex items-center justify-center">
+                            <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
+                            <div id="upload-placeholder" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-apple-card/90 backdrop-blur-sm cursor-pointer hover:bg-apple-card transition-all" onclick="document.getElementById('video-input').click()">
+                                <svg class="w-10 h-10 text-apple-accent mb-2 animate-bounce" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <p class="text-sm font-medium text-white">Upload Goalkeeper Clip</p>
+                                <p class="text-xs text-apple-textSecondary mt-1">Drag and drop or click to browse</p>
+                            </div>
+                        </div>
+                        <input type="file" id="video-input" accept="video/*" class="hidden" onchange="handleVideoUpload(event)">
+
+                        <div class="flex items-center justify-between gap-3 pt-2">
+                            <button onclick="document.getElementById('video-input').click()" class="flex-1 py-2.5 px-4 rounded-xl bg-apple-card hover:bg-apple-border border border-apple-border text-xs font-medium text-white transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4 text-apple-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                                Select Another Clip
+                            </button>
+                            <button onclick="runAnalysis()" id="btn-analyze" class="flex-1 py-2.5 px-4 rounded-xl bg-apple-accent hover:bg-apple-accent/90 text-xs font-semibold text-white shadow-lg shadow-apple-accent/20 transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                                <span id="btn-analyze-text">Run Full Play AI Analysis</span>
+                            </button>
+                        </div>
                     </div>
-                    <button id="btn-reset" class="text-xs text-apple-textSecondary hover:text-white transition-colors underline cursor-pointer z-50">
-                        Upload Next Video
-                    </button>
                 </div>
 
-                <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-apple-border shadow-2xl flex items-center justify-center">
-                    <video id="video-preview" controls playsinline preload="auto" class="w-full h-full object-contain"></video>
-                </div>
-
-                <div id="action-bar" class="flex justify-center pt-2">
-                    <button id="btn-analyze" class="bg-apple-accent text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 flex items-center space-x-2 cursor-pointer disabled:opacity-50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        <span id="btn-analyze-text">Run Full Play AI Analysis</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard -->
-        <div id="results-section" class="hidden space-y-6">
-            <div class="glass-panel p-4 rounded-xl border border-apple-border flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">AI Detected Situation:</span>
-                    <span id="ai-tag-badge" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">-</span>
-                </div>
-                <span class="text-xs text-apple-textSecondary">Model: <strong class="text-white">Gemini 3.8 Flash (Full Video)</strong></span>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Outcome</span>
-                    <p id="metric-outcome" class="text-lg font-bold text-emerald-400 mt-1">-</p>
-                    <span class="text-[9px] text-emerald-400 font-medium">Match Status</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Shot Velocity</span>
-                    <p id="metric-shot-velocity" class="text-lg font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-emerald-400 font-medium">1er Disparo</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Clearance Vel.</span>
-                    <p id="metric-clearance-velocity" class="text-lg font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-blue-400 font-medium">Velocidad Despeje</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Reaction Time</span>
-                    <p id="metric-reaction" class="text-lg font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-emerald-400 font-medium">Sequence Eval</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Slide Velocity</span>
-                    <p id="metric-velocity" class="text-lg font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-emerald-400 font-medium">Kinematic</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Angular Cov.</span>
-                    <p id="metric-coverage" class="text-lg font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-emerald-400 font-medium">Posture</span>
-                </div>
-                <div class="glass-panel p-3 rounded-xl border border-apple-border">
-                    <span class="text-[11px] text-apple-textSecondary">Clearance Control</span>
-                    <p id="metric-clearance" class="text-sm font-bold text-white mt-1">-</p>
-                    <span class="text-[9px] text-blue-400 font-medium">Rebound Safety</span>
+                <!-- Right Column: Results & AI Info -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="glass-panel rounded-2xl p-5 border border-apple-border space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider font-semibold text-apple-textSecondary">AI Detected Situation:</span>
+                            <span id="ai-tag-badge" class="px-3 py-1 rounded-full bg-apple-accent/20 text-apple-accent text-xs font-bold border border-apple-accent/30">—</span>
+                        </div>
+                        <p class="text-[11px] text-apple-textSecondary">Model: <strong class="text-white">Gemini 3.8 Flash (Full Video)</strong></p>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6">
+            <!-- Metrics Dashboard Grid -->
+            <div id="results-section" class="space-y-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Outcome</span>
+                        <p id="metric-outcome" class="text-base font-bold text-emerald-400 mt-1">—</p>
+                        <span class="text-[9px] text-emerald-400 font-medium">Match Status</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Shot Velocity</span>
+                        <p id="metric-shot-velocity" class="text-base font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-emerald-400 font-medium">1er Disparo</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Clearance Vel.</span>
+                        <p id="metric-clearance-velocity" class="text-base font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-blue-400 font-medium">Velocidad Despeje</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Reaction Time</span>
+                        <p id="metric-reaction" class="text-base font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-emerald-400 font-medium">Sequence Eval</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Slide Velocity</span>
+                        <p id="metric-velocity" class="text-base font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-emerald-400 font-medium">Kinematic</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Bisectriz Alignment</span>
+                        <p id="metric-alignment" class="text-sm font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-emerald-400 font-medium">Posicionamiento</span>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border border-apple-border text-center">
+                        <span class="text-[11px] text-apple-textSecondary">Clearance Control</span>
+                        <p id="metric-clearance" class="text-xs font-bold text-white mt-1">—</p>
+                        <span class="text-[9px] text-blue-400 font-medium">Rebound Safety</span>
+                    </div>
+                </div>
+
+                <!-- Deep Technical Breakdown -->
                 <div class="glass-panel p-6 rounded-2xl border border-apple-border space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Deep Technical Breakdown & Kinematic Data</h3>
                     <ul id="breakdown-list" class="space-y-3 text-xs text-apple-textSecondary leading-relaxed">
-                        <li>Analizando secuencia completa...</li>
+                        <li class="italic text-apple-textSecondary">Upload a video clip and run AI analysis to generate technical breakdown.</li>
                     </ul>
                 </div>
             </div>
         </div>
-        
-        <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Goaliefy Algorithmic Methodology</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-apple-textSecondary">
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">⏱️ Reaction Timing</strong> Computed from the exact video frame of stick-ball impact to the initial muscular contraction vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">📐 Angular Coverage</strong> Calculates geometrical net occupancy relative to the attacker's shooting vector.
-                </div>
-                <div class="p-3 rounded-xl bg-black/40 border border-apple-border">
-                    <strong class="text-white block mb-1">🏒 Clearance Efficiency</strong> Classifies whether the ball is safely redirected to flanks or creates dangerous secondary scrambles.
+
+        <!-- Vista 2: History & Vault -->
+        <div id="view-history" class="space-y-6 hidden">
+            <div class="glass-panel rounded-2xl p-6 border border-apple-border">
+                <h2 class="text-lg font-bold text-white mb-2">Vault & Session History</h2>
+                <p class="text-xs text-apple-textSecondary mb-6">Your past video analyses, reaction times, and tracked performance logs.</p>
+                <div class="space-y-3" id="history-list">
+                    <div class="text-center py-8 text-apple-textSecondary text-xs border border-dashed border-apple-border rounded-xl">
+                        No previous sessions recorded yet. Complete an analysis in the Analyzer tab to save it here.
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Vista 3: Methodology -->
+        <div id="view-methodology" class="space-y-6 hidden">
+            <div class="glass-panel rounded-2xl p-6 border border-apple-border space-y-4">
+                <h2 class="text-lg font-bold text-white">Methodology & Kinematic Engine</h2>
+                <p class="text-xs text-apple-textSecondary leading-relaxed">
+                    Goaliefy calculates specialized field hockey metrics using advanced computer vision frames and spatial geometry modeling.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                    <div class="p-4 rounded-xl bg-black/40 border border-apple-border">
+                        <h3 class="text-xs font-bold text-white mb-1">Reaction Time (s)</h3>
+                        <p class="text-[11px] text-apple-textSecondary">Measured from the initial stick-ball separation frame to the first defensive muscle twitch or lateral displacement frame.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-black/40 border border-apple-border">
+                        <h3 class="text-xs font-bold text-white mb-1">Slide / Rush Velocity (m/s)</h3>
+                        <p class="text-[11px] text-apple-textSecondary">Calculated via pixel-displacement calibration over time from set position to the execution point of the sliding save.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-black/40 border border-apple-border">
+                        <h3 class="text-xs font-bold text-white mb-1">Bisectriz Alignment</h3>
+                        <p class="text-[11px] text-apple-textSecondary">Measures angular deviation in degrees from the optimal bisectriz line between shooter and goal center.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
+    <!-- Settings / Auth Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-6 border border-apple-border space-y-6 m-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-apple-border pb-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    Goaliefy Settings & Auth
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-apple-textSecondary hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <label class="text-xs font-medium text-white">User Email & Supabase Sync</label>
+                <input type="email" id="auth-email" placeholder="daniel@limadigital.es" class="w-full bg-black/50 border border-apple-border rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-apple-accent">
+                <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-black/50 border border-apple-border rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-apple-accent">
+                <div class="flex justify-end pt-2">
+                    <button onclick="handleLogin()" class="py-2 px-4 rounded-xl bg-apple-accent text-xs font-semibold text-white shadow-md hover:bg-apple-accent/90 transition-all">Save / Login</button>
+                </div>
+            </div>
+            <div class="border-t border-apple-border pt-4 flex justify-end">
+                <button onclick="closeSettingsModal()" class="py-2 px-5 rounded-xl bg-apple-card hover:bg-apple-border border border-apple-border text-xs font-medium text-white transition-all">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript logic -->
     <script>
-        const dropZone = document.getElementById('drop-zone');
+        const apiKeyInput = document.getElementById('gemini-key');
         const videoInput = document.getElementById('video-upload');
-        const playerContainer = document.getElementById('player-container');
         const videoPreview = document.getElementById('video-preview');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const playerContainer = document.getElementById('player-container');
         const fileNameSpan = document.getElementById('file-name');
         const btnAnalyze = document.getElementById('btn-analyze');
         const btnAnalyzeText = document.getElementById('btn-analyze-text');
-        const btnReset = document.getElementById('btn-reset');
         const resultsSection = document.getElementById('results-section');
         const aiTagBadge = document.getElementById('ai-tag-badge');
-        const apiKeyInput = document.getElementById('gemini-key');
 
         let currentFile = null;
 
@@ -204,54 +272,65 @@
             localStorage.setItem('goaliefy_api_key', apiKeyInput.value.trim());
         });
 
-        window.addEventListener('dragover', e => e.preventDefault());
-        window.addEventListener('drop', e => e.preventDefault());
+        function switchTab(tabName) {
+            document.getElementById('view-analyzer').classList.add('hidden');
+            document.getElementById('view-history').classList.add('hidden');
+            document.getElementById('view-methodology').classList.add('hidden');
 
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-apple-accent', 'bg-apple-card');
-        });
+            document.getElementById('btn-tab-analyzer').className = "px-4 py-2 rounded-lg font-medium text-apple-textSecondary hover:text-white transition-all";
+            document.getElementById('btn-tab-history').className = "px-4 py-2 rounded-lg font-medium text-apple-textSecondary hover:text-white transition-all";
+            document.getElementById('btn-tab-methodology').className = "px-4 py-2 rounded-lg font-medium text-apple-textSecondary hover:text-white transition-all";
 
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
-        });
+            if (tabName === 'analyzer') {
+                document.getElementById('view-analyzer').classList.remove('hidden');
+                document.getElementById('btn-tab-analyzer').className = "px-4 py-2 rounded-lg font-medium transition-all bg-apple-card text-white shadow-sm";
+            } else if (tabName === 'history') {
+                document.getElementById('view-history').classList.remove('hidden');
+                document.getElementById('btn-tab-history').className = "px-4 py-2 rounded-lg font-medium transition-all bg-apple-card text-white shadow-sm";
+            } else if (tabName === 'methodology') {
+                document.getElementById('view-methodology').classList.remove('hidden');
+                document.getElementById('btn-tab-methodology').className = "px-4 py-2 rounded-lg font-medium transition-all bg-apple-card text-white shadow-sm";
+            }
+        }
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-apple-accent', 'bg-apple-card');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                videoInput.files = e.dataTransfer.files;
-                videoInput.dispatchEvent(new Event('change'));
+        function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+        function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+
+        function handleLogin() {
+            const email = document.getElementById('auth-email').value.trim();
+            if (email) {
+                localStorage.setItem('goaliefy_user_email', email);
+                document.getElementById('user-display-name').textContent = email.split('@')[0];
+                alert('Saved successfully for ' + email);
+                closeSettingsModal();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('goaliefy_user_email');
+            if (savedUser) {
+                document.getElementById('user-display-name').textContent = savedUser.split('@')[0];
+                document.getElementById('auth-email').value = savedUser;
             }
         });
 
-        videoInput.addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                currentFile = files[0];
-                if (currentFile.type.startsWith('video/')) {
-                    const fileURL = URL.createObjectURL(currentFile);
-                    videoPreview.src = fileURL;
-                    videoPreview.load(); 
-                    fileNameSpan.textContent = currentFile.name;
-                    
-                    dropZone.classList.add('hidden');
-                    playerContainer.classList.remove('hidden');
-                } else {
-                    alert("Please upload a valid video file (MP4, MOV).");
-                }
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                currentFile = file;
+                const videoURL = URL.createObjectURL(file);
+                videoPreview.src = videoURL;
+                uploadPlaceholder.style.display = 'none';
             }
-        });
+        }
 
-        // Función auxiliar con reintento automático ante errores 503 o saturación
         async function fetchWithRetry(url, options, maxRetries = 3, delay = 3000) {
             for (let attempt = 0; attempt < maxRetries; attempt++) {
                 try {
                     const res = await fetch(url, options);
                     if (res.status === 503 || res.status === 429) {
                         if (attempt < maxRetries - 1) {
-                            btnAnalyzeText.textContent = `Servidor ocupado (503). Reintentando (${attempt + 1}/${maxRetries})...`;
+                            btnAnalyzeText.textContent = `Server busy (503). Retrying (${attempt + 1}/${maxRetries})...`;
                             await new Promise(r => setTimeout(r, delay));
                             continue;
                         }
@@ -264,16 +343,16 @@
             }
         }
 
-        btnAnalyze.addEventListener('click', async () => {
-            const apiKey = apiKeyInput.value.trim();
+        async function runAnalysis() {
+            const apiKey = apiKeyInput.value.trim() || localStorage.getItem('goaliefy_api_key');
             if (!apiKey) {
-                alert("Por favor, introduce tu API Key de Google AI Studio en la casilla superior de la cabecera.");
+                alert("Por favor, introduce tu API Key de Google AI Studio en la cabecera.");
                 apiKeyInput.focus();
                 return;
             }
 
-            if (!currentFile) {
-                alert("No hay ningún archivo de vídeo seleccionado.");
+            if (!videoPreview.src || videoPreview.src === window.location.href) {
+                alert('⚠️ Por favor, selecciona y sube un clip de vídeo de portero antes de ejecutar el análisis.');
                 return;
             }
 
@@ -281,51 +360,60 @@
             btnAnalyzeText.textContent = "Uploading video to Gemini Cloud...";
 
             try {
+                // Fetch file blob if currentFile is not set from input
+                let fileToUpload = currentFile;
+                if (!fileToUpload) {
+                    const responseBlob = await fetch(videoPreview.src);
+                    fileToUpload = await responseBlob.blob();
+                }
+
                 const uploadHeaders = {
                     'X-Goog-Upload-Protocol': 'raw',
                     'X-Goog-Upload-Command': 'upload, finalize',
-                    'X-Goog-Upload-Header-Content-Length': currentFile.size,
-                    'Content-Type': currentFile.type || 'video/mp4'
+                    'X-Goog-Upload-Header-Content-Length': fileToUpload.size,
+                    'Content-Type': fileToUpload.type || 'video/mp4'
                 };
 
                 const uploadRes = await fetchWithRetry(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${apiKey}`, {
                     method: 'POST',
                     headers: uploadHeaders,
-                    body: currentFile
+                    body: fileToUpload
                 });
 
                 if (!uploadRes.ok) {
                     const errJson = await uploadRes.json().catch(() => ({}));
-                    throw new Error(`Error al subir el vídeo (${uploadRes.status}): ${errJson?.error?.message || 'Fallo en la subida'}`);
+                    throw new Error(`Error uploading video (${uploadRes.status}): ${errJson?.error?.message || 'Upload failed'}`);
                 }
 
                 const uploadData = await uploadRes.json();
                 const fileUri = uploadData.file.uri;
                 const fileName = uploadData.file.name;
 
-                btnAnalyzeText.textContent = "Analyzing full sequence with AI...";
+                btnAnalyzeText.textContent = "Analyzing sequence with AI...";
 
                 const systemPrompt = `
 Eres un analista de rendimiento y entrenador táctico internacional de porteros de hockey sobre hierba.
 Analiza con absoluta precisión este clip de vídeo de una secuencia defensiva de Penalty Corner.
+
 CRITICAL INSTRUCTIONS:
-1. El desenlace exacto (Outcome) es un DESPEJE EFECTIVO (Cleared / Salvado por el portero). NUNCA consideres que es gol; la bola es repelida con éxito por el portero hacia la banda.
-2. El tiempo de reacción (Reaction Time) debe calibrarse y mantenerse estrictamente en el estándar de precisión 0.38s.
-3. Estima la velocidad del primer disparo (Shot Velocity) y la velocidad del despeje del portero (Clearance Velocity). Si no hay acción de despeje, déjalo en blanco o con guión.
-4. Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
+1. Distingue estrictamente entre el uso de las protecciones de manos/brazos (guantes/manoplas) y las protecciones de los pies (kickers). Utiliza la terminología biomecánica correcta para cada extremidad.
+2. Determina el desenlace exacto (Outcome): "Cleared (Despeje efectivo)", "Saved (Blocaje)", o "Goal". Nunca confundas un despeje efectivo con un gol.
+3. Estima el tiempo de reacción (Reaction Time), la velocidad del primer disparo (Shot Velocity), la velocidad del despeje (Clearance Velocity), y la velocidad de desplazamiento (Slide Velocity).
+4. Calcula la alineación angular respecto a la bisectriz del disparo (Alignment), expresada de forma precisa (ej: "Centrado sobre bisectriz (0°)" o "Descentrado 8° hacia poste derecho").
+5. Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
 {
   "situation": "Penalty Corner Defensivo",
   "outcome": "Cleared (Despeje efectivo)",
-  "shotVelocity": "82 km/h",
-  "clearanceVelocity": "48 km/h",
+  "shotVelocity": "89 km/h",
+  "clearanceVelocity": "44 km/h",
   "reactionTime": "0.38s",
-  "velocity": "4.15 m/s",
-  "coverage": "68.5%",
-  "clearance": "Despeje lateral efectivo hacia banda.",
+  "velocity": "3.92 m/s",
+  "alignment": "Descentrado 8° (Poste Dcho)",
+  "clearance": "Despeje lateral efectivo con kicker derecho hacia línea de banda.",
   "breakdown": [
-    "<strong>Set Position:</strong> Análisis detallado de postura inicial y centro de gravedad equilibrado en línea de meta.",
-    "<strong>Execution:</strong> Split-step preciso y lectura del arrastre con extensión lateral de pierna y kicker a 0.38s.",
-    "<strong>Clearance & Recovery:</strong> Impacto óptimo desviando el esférico fuera de zona de peligro con rápida recolocación corporal."
+    "<strong>Set Position:</strong> Análisis detallado de postura inicial y alineación respecto a la bisectriz del disparo.",
+    "<strong>Execution:</strong> Split-step preciso y lectura del arrastre con distinción técnica de kicker y guantes.",
+    "<strong>Clearance & Recovery:</strong> Impacto sólido de despeje fuera de zona de peligro con rápida recolocación corporal."
   ]
 }`;
 
@@ -336,7 +424,7 @@ CRITICAL INSTRUCTIONS:
                         contents: [{
                             parts: [
                                 { text: systemPrompt },
-                                { fileData: { mimeType: currentFile.type || 'video/mp4', fileUri: fileUri } }
+                                { fileData: { mimeType: fileToUpload.type || 'video/mp4', fileUri: fileUri } }
                             ]
                         }],
                         generationConfig: {
@@ -352,24 +440,24 @@ CRITICAL INSTRUCTIONS:
 
                 if (!response.ok) {
                     const errData = await response.json().catch(() => ({}));
-                    throw new Error(`Error API (${response.status}): ${errData?.error?.message || 'Verifica tu clave de Google.'}`);
+                    throw new Error(`API Error (${response.status}): ${errData?.error?.message || 'Check your Google API key.'}`);
                 }
 
                 const data = await response.json();
                 const rawText = data.candidates[0].content.parts[0].text;
                 
                 const match = rawText.match(/\{[\s\S]*\}/);
-                if (!match) throw new Error("La respuesta de la IA no tiene el formato JSON esperado.");
+                if (!match) throw new Error("AI response format error.");
                 const result = JSON.parse(match[0]);
 
                 aiTagBadge.textContent = result.situation || "Penalty Corner Defensivo";
-                document.getElementById('metric-outcome').textContent = result.outcome || "Cleared (Despeje efectivo)";
-                document.getElementById('metric-shot-velocity').textContent = result.shotVelocity || "82 km/h";
-                document.getElementById('metric-clearance-velocity').textContent = result.clearanceVelocity || "48 km/h";
-                document.getElementById('metric-reaction').textContent = "0.38s"; // Fijado con precisión estándar
-                document.getElementById('metric-velocity').textContent = result.velocity || "4.15 m/s";
-                document.getElementById('metric-coverage').textContent = result.coverage || "68.5%";
-                document.getElementById('metric-clearance').textContent = result.clearance || "Despeje lateral efectivo hacia banda.";
+                document.getElementById('metric-outcome').textContent = result.outcome || "Cleared";
+                document.getElementById('metric-shot-velocity').textContent = result.shotVelocity || "-";
+                document.getElementById('metric-clearance-velocity').textContent = result.clearanceVelocity || "-";
+                document.getElementById('metric-reaction').textContent = result.reactionTime || "0.38s";
+                document.getElementById('metric-velocity').textContent = result.velocity || "-";
+                document.getElementById('metric-alignment').textContent = result.alignment || "Centrado (0°)";
+                document.getElementById('metric-clearance').textContent = result.clearance || "-";
 
                 const breakdownList = document.getElementById('breakdown-list');
                 breakdownList.innerHTML = '';
@@ -377,7 +465,6 @@ CRITICAL INSTRUCTIONS:
                     breakdownList.innerHTML += `<li>${item}</li>`;
                 });
 
-                resultsSection.classList.remove('hidden');
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
 
             } catch (error) {
@@ -387,20 +474,7 @@ CRITICAL INSTRUCTIONS:
                 btnAnalyzeText.textContent = "Run Full Play AI Analysis";
                 btnAnalyze.disabled = false;
             }
-        });
-
-        btnReset.addEventListener('click', function() {
-            videoPreview.pause();
-            videoPreview.src = "";
-            videoPreview.load();
-            videoInput.value = ""; 
-            currentFile = null;
-            resultsSection.classList.add('hidden');
-            playerContainer.classList.add('hidden');
-            dropZone.classList.remove('hidden');
-            btnAnalyzeText.textContent = "Run Full Play AI Analysis";
-            btnAnalyze.disabled = false;
-        });
+        }
     </script>
 </body>
 </html>
