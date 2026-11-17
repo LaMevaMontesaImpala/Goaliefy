@@ -391,31 +391,41 @@
 
                 btnAnalyzeText.textContent = "Analyzing sequence with AI...";
 
-                const systemPrompt = `
+const systemPrompt = `
 Eres un analista de rendimiento y entrenador táctico internacional de porteros de hockey sobre hierba.
-Analiza con absoluta precisión este clip de vídeo de una secuencia defensiva de Penalty Corner.
+Analiza con absoluta precisión este clip de vídeo de una secuencia defensiva.
 
-CRITICAL INSTRUCTIONS:
-1. Distingue estrictamente entre el uso de las protecciones de manos/brazos (guantes/manoplas) y las protecciones de los pies (kickers). Utiliza la terminología biomecánica correcta para cada extremidad.
-2. Determina el desenlace exacto (Outcome): "Cleared (Despeje efectivo)", "Saved (Blocaje)", o "Goal". Nunca confundas un despeje efectivo con un gol.
-3. Estima el tiempo de reacción (Reaction Time), la velocidad del primer disparo (Shot Velocity), la velocidad del despeje (Clearance Velocity), y la velocidad de desplazamiento (Slide Velocity).
-4. Calcula la alineación angular respecto a la bisectriz del disparo (Alignment), expresada de forma precisa (ej: "Centrado sobre bisectriz (0°)" o "Descentrado 8° hacia poste derecho").
-5. Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
+CRITICAL INSTRUCTIONS (TAXONOMÍA CERRADA - CERO ALUCINACIONES):
+1. CLASIFICACIÓN OBLIGATORIA DE LA SITUACIÓN: Debes clasificar la jugada eligiendo EXCLUSIVAMENTE una de estas opciones de nuestro diccionario cerrado:
+   - "Penalty Corner (Defensa de Arrastre / Variación)"
+   - "1v1 en Área / Circle Entry"
+   - "Juego Abierto / Transición Defensiva"
+   - "Golpe Franco / Free Hit (Sin disparo directo)"
+   - "Salida de Balón / Build-up"
+
+2. FILTRO CONDICIONAL DE ACCIÓN DE TIRO:
+   - Si la situación es "Golpe Franco / Free Hit (Sin disparo directo)" o "Salida de Balón / Build-up", el desenlace (Outcome) debe ser "N/A (Sin disparo)" y las métricas de "shotVelocity", "clearanceVelocity" y "slideVelocity" deben ir obligatoriamente en "—". El desglose se centrará en posicionamiento, comunicación y lectura táctica.
+   - Si es un "Penalty Corner" o un "1v1 en Área", evalúa el desenlace real ("Goal", "Saved", "Cleared") y calcula las velocidades cinemáticas correspondientes.
+
+3. ANATOMÍA Y BIOMECÁNICA: Distingue rigurosamente entre los kickers (protecciones de los pies) y los guantes/manoplas (protecciones de las manos).
+
+4. Devuelve los resultados en un objeto JSON válido (sin formato Markdown adicional, solo el JSON puro) con exactamente esta estructura:
 {
-  "situation": "Penalty Corner Defensivo",
-  "outcome": "Cleared (Despeje efectivo)",
-  "shotVelocity": "89 km/h",
-  "clearanceVelocity": "44 km/h",
-  "reactionTime": "0.38s",
-  "velocity": "3.92 m/s",
-  "alignment": "Descentrado 8° (Poste Dcho)",
-  "clearance": "Despeje lateral efectivo con kicker derecho hacia línea de banda.",
+  "situation": "Una de las opciones exactas de la taxonomía cerrada",
+  "outcome": "Goal / Saved / Cleared / N/A (Sin disparo)",
+  "shotVelocity": "xx km/h o —",
+  "clearanceVelocity": "xx km/h o —",
+  "reactionTime": "0.38s o —",
+  "velocity": "x.xx m/s o —",
+  "alignment": "Posicionamiento respecto a la bisectriz (ej: Centrado 0°)",
+  "clearance": "Control de rebote o N/A",
   "breakdown": [
-    "<strong>Set Position:</strong> Análisis detallado de postura inicial y alineación respecto a la bisectriz del disparo.",
-    "<strong>Execution:</strong> Split-step preciso y lectura del arrastre con distinción técnica de kicker y guantes.",
-    "<strong>Clearance & Recovery:</strong> Impacto sólido de despeje fuera de zona de peligro con rápida recolocación corporal."
+    "<strong>Set Position:</strong> Postura inicial y colocación según la situación real.",
+    "<strong>Execution:</strong> Análisis de la intervención defensiva u observación táctica.",
+    "<strong>Tactical Read:</strong> Lectura de la jugada y anticipación."
   ]
-}`;
+}
+`;
 
                 const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
